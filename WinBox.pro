@@ -13,8 +13,19 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        widget.cpp
+        widget.cpp \
+    CameraGet.cpp \
+    Encode.cpp \
+    Decode.cpp
 
-HEADERS  += widget.h
+HEADERS  += widget.h \
+    CameraGet.h \
+    Encode.h \
+    Decode.h
 
 FORMS    += widget.ui
+
+INCLUDEPATH += D:\OpenCV\install\include\opencv \
+D:\OpenCV\install\include
+
+LIBS += -LD:\OpenCV\install\bin -llibopencv_core231 -llibopencv_highgui231
