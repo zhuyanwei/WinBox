@@ -3,7 +3,10 @@
 
 #include <QWidget>
 #include "CameraGet.h"
+#include "ThreadCamera.h"
 #include <QImage>
+#include <QTime>
+#include <QDebug>
 
 namespace Ui {
 class Widget;
@@ -18,10 +21,15 @@ public:
     ~Widget();
 
 private slots:
-    void on_B_OpenCam_clicked();
+    void on_B_OpenCam();
+    void showLocalPic();
 
 private:
     Ui::Widget *ui;
+    ThreadCamera *TC;
+    bool isStart;
+    QTimer *timerCam;
+    QImage *img;
 };
 
 #endif // WIDGET_H

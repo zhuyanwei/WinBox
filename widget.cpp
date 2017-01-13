@@ -6,6 +6,9 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
+
+    //connect sigmal and slot
+    connect(ui->B_OpenCam,SIGNAL(clicked()),this,SLOT(on_B_OpenCam()));
 }
 
 Widget::~Widget()
@@ -13,10 +16,16 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::on_B_OpenCam_clicked()
+void Widget::showLocalPic()
 {
-    //show frames on the L_LocalWimdow
-    CameraGet cg = new CameraGet();
-    cg.openCamera(200,200);
-    QImage image = QImage((const uchar*)CT->cap_frame->imageData,CT->cap_frame->width, CT->cap_frame->height, QImage::Format_RGB888).rgbSwapped();
+    QImage img1 = QImage((const uchar*)TC->capFrame->imageData,TC->capFrame->width, TC->capFrame->height, QImage::Format_RGB888).rgbSwapped();
+    ui->L_LocalWindow->setPixmap(QPixmap::fromImage(img1));
+}
+
+void Widget::on_B_OpenCam()
+{
+    qDebug()<<"B_OpenCam clicked";
+    TC = new ThreadCamera();
+    connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()));
+    TC->start();
 }

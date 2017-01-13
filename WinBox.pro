@@ -16,12 +16,15 @@ SOURCES += main.cpp\
         widget.cpp \
     CameraGet.cpp \
     Encode.cpp \
-    Decode.cpp
+    Decode.cpp \
+    ThreadCamera.cpp
 
 HEADERS  += widget.h \
     CameraGet.h \
     Encode.h \
-    Decode.h
+    Decode.h \
+    ThreadCamera.h \
+    COMDEF.h
 
 FORMS    += widget.ui
 
