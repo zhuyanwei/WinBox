@@ -22,6 +22,8 @@ public:
 
 private slots:
     void on_B_OpenCam();
+    void on_B_CloseCam();
+    void on_B_Pause();
     void showLocalPic();
 
 private:
@@ -30,6 +32,7 @@ private:
     bool isStart;
     QTimer *timerCam;
     QImage *img;
+    QImage imgLocal;
 };
 
 #endif // WIDGET_H

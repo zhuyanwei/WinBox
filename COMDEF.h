@@ -1,8 +1,8 @@
 #ifndef COMDEF_H
 #define COMDEF_H
 
-#define WIDTH 320
-#define HEIGHT 240
+#define WIDTH 200
+#define HEIGHT 200
 
 
 #endif // COMDEF_H
