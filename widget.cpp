@@ -46,12 +46,13 @@ void Widget::on_B_CloseCam()
     qDebug()<<"B_CloseCam clicked";
     isStart = false;
     TC->stop();
+    TC->sleep(1);
     TC->~ThreadCamera();
     ui->L_LocalWindow->setText("LocalWindow");
 }
 
 void Widget::on_B_Pause()
 {
-    qDebug()<<"B_CloseCam clicked";
+    qDebug()<<"B_Pause clicked";
     TC->stop();
 }

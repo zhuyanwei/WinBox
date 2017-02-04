@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
+#include <assert.h>
 #include "FFMPEG_COMMON.h"
 
 namespace Ui {

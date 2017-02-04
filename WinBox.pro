@@ -17,7 +17,8 @@ SOURCES += main.cpp\
     CameraGet.cpp \
     Encode.cpp \
     Decode.cpp \
-    ThreadCamera.cpp
+    ThreadCamera.cpp \
+    Convert.cpp
 
 HEADERS  += widget.h \
     CameraGet.h \
@@ -25,7 +26,8 @@ HEADERS  += widget.h \
     Decode.h \
     ThreadCamera.h \
     COMDEF.h \
-    FFMPEG_COMMON.h
+    FFMPEG_COMMON.h \
+    Convert.h
 
 FORMS    += widget.ui
 

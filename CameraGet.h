@@ -2,6 +2,7 @@
 #define CAMERAGET_H
 
 #include <QObject>
+#include <QDebug>
 #include <highgui.h>
 #include <cv.h>
 
