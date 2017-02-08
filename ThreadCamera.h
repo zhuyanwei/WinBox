@@ -8,7 +8,7 @@
 #include "CameraGet.h"
 #include "Convert.h"
 #include "Encode.h"
-#include "Rtpsend.h"
+#include "RtpSend.h"
 
 namespace Ui {
 class ThreadCamera;

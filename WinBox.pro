@@ -20,7 +20,7 @@ SOURCES += main.cpp\
     ThreadCamera.cpp \
     Convert.cpp \
     Video.cpp \
-    Rtpsend.cpp
+    RtpSend.cpp
 
 HEADERS  += widget.h \
     CameraGet.h \
@@ -31,7 +31,8 @@ HEADERS  += widget.h \
     FFMPEG_COMMON.h \
     Convert.h \
     Video.h \
-    Rtpsend.h
+    RtpSend.h \
+    COMRTP.h
 
 FORMS    += widget.ui
 
