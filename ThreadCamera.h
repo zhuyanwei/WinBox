@@ -8,6 +8,7 @@
 #include "CameraGet.h"
 #include "Convert.h"
 #include "Encode.h"
+#include "Rtpsend.h"
 
 namespace Ui {
 class ThreadCamera;
@@ -22,18 +23,21 @@ public:
 
     void stop();
     IplImage *capFrame;
+    void *capBuf,*cvtBuf,*hdBuf,*encBuf;
+    int capLen, cvtLen, hdLen, encLen, pacLen;
 
 private:
     CameraGet *cg;
     Convert *cv;
     Encode *ec;
+    RtpSend *rs;
 
     int ret;
     bool isStop;
 
     char *pacBuf ;
-    void *capBuf,*cvtBuf,*hdBuf,*encBuf;
-    int capLen, cvtLen, hdLen, encLen, pacLen;
+//    void *capBuf,*cvtBuf,*hdBuf,*encBuf;
+//    int capLen, cvtLen, hdLen, encLen, pacLen;
     enum Encode::picType pType;
     unsigned long frameCount;
 
@@ -42,6 +46,7 @@ protected:
 
 signals:
     void captured();
+    void sendDone(void *encBuf,int encLen);
 
 public slots:
 };

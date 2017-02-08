@@ -2,11 +2,11 @@
 #define WIDGET_H
 
 #include <QWidget>
-#include "CameraGet.h"
-#include "ThreadCamera.h"
 #include <QImage>
 #include <QTime>
 #include <QDebug>
+#include "ThreadCamera.h"
+#include "Video.h"
 
 namespace Ui {
 class Widget;
@@ -25,14 +25,17 @@ private slots:
     void on_B_CloseCam();
     void on_B_Pause();
     void showLocalPic();
+    void showRemotePic();
 
 private:
     Ui::Widget *ui;
     ThreadCamera *TC;
+    Video *vid;
     bool isStart;
     QTimer *timerCam;
     QImage *img;
     QImage imgLocal;
+    QImage imgRemote;
 };
 
 #endif // WIDGET_H

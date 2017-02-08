@@ -70,8 +70,10 @@ void ThreadCamera::run()
         {
             qDebug()<<"--- No encode data";
         }
+        //send or restore the data.....encBuf,encLen
+        emit sendDone(encBuf,encLen);
         frameCount++;
-//        qDebug()<<frameCount;
+        qDebug()<<frameCount;
     }
     isStop = true;
     qDebug()<<"ThreadCamera out";

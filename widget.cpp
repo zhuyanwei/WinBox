@@ -32,12 +32,32 @@ void Widget::showLocalPic()
     }
 }
 
+void Widget::showRemotePic()
+{
+    qDebug()<<"showRemotePic start";
+    imgRemote = QImage((const uchar*)vid->disBufR,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
+    ui->L_RemoteWindow->setPixmap(QPixmap::fromImage(imgRemote));
+}
+
 void Widget::on_B_OpenCam()
 {
     qDebug()<<"B_OpenCam clicked";
+//    isStart = true;
+//    TC = new ThreadCamera();
+//    connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()));
+//    TC->start();
+
+//    vid = new Video();
+//    connect(vid,SIGNAL(decodeDone()),this,SLOT(showRemotePic()));
+//    connect(TC,SIGNAL(sendDone()),vid,SLOT(readingFrame(TC->encBuf,TC->encLen)));
+////    vid->readingFrame(TC->encBuf,TC->encLen);
+
     isStart = true;
     TC = new ThreadCamera();
+    vid = new Video();
     connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()));
+    connect(vid,SIGNAL(decodeDone()),this,SLOT(showRemotePic()));
+    connect(TC,SIGNAL(sendDone(void*,int)),vid,SLOT(readingFrame(void*,int)));
     TC->start();
 }
 
