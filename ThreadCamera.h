@@ -18,10 +18,10 @@ class ThreadCamera : public QThread
 {
     Q_OBJECT
 public:
-    explicit ThreadCamera();
+    explicit ThreadCamera(RTPSession *session);
     ~ThreadCamera();
-
     void stop();
+
     IplImage *capFrame;
     void *capBuf,*cvtBuf,*hdBuf,*encBuf;
     int capLen, cvtLen, hdLen, encLen, pacLen;
@@ -36,8 +36,6 @@ private:
     bool isStop;
 
     char *pacBuf ;
-//    void *capBuf,*cvtBuf,*hdBuf,*encBuf;
-//    int capLen, cvtLen, hdLen, encLen, pacLen;
     enum Encode::picType pType;
     unsigned long frameCount;
 

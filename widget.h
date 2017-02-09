@@ -30,6 +30,7 @@ private slots:
 private:
     Ui::Widget *ui;
     ThreadCamera *TC;
+    RTPSession session;
     Video *vid;
     bool isStart;
     QTimer *timerCam;

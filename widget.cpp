@@ -53,7 +53,7 @@ void Widget::on_B_OpenCam()
 ////    vid->readingFrame(TC->encBuf,TC->encLen);
 
     isStart = true;
-    TC = new ThreadCamera();
+    TC = new ThreadCamera(&session);
     vid = new Video();
     connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()));
     connect(vid,SIGNAL(decodeDone()),this,SLOT(showRemotePic()));
@@ -66,7 +66,7 @@ void Widget::on_B_CloseCam()
     qDebug()<<"B_CloseCam clicked";
     isStart = false;
     TC->stop();
-    TC->sleep(1);
+    TC->sleep(2);
     TC->~ThreadCamera();
     ui->L_LocalWindow->setText("LocalWindow");
 }
