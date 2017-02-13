@@ -53,7 +53,7 @@ void ThreadCamera::run()
     while(!isStop)
     {
         ret = cg->readFrame(&capFrame);
-//        emit captured();
+        emit captured();
         capBuf = (void *)capFrame->imageData;
         capLen = capFrame->imageSize;
         ret = cv->convertDo(capBuf,capLen,&cvtBuf,&cvtLen);
@@ -77,10 +77,6 @@ void ThreadCamera::run()
         //send or restore the data.....encBuf,encLen
 //        emit sendDone(encBuf,encLen);
         rs->packPut(encBuf, encLen);
-//        for(int i = 0 ;i < 100; i++)
-//        {
-//            rs->packGet(pacBuf, MAXDATASIZE, &pacLen);
-//        }
         while(rs->packGet(pacBuf, MAXDATASIZE, &pacLen) == 1)
         {
 

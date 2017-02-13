@@ -64,15 +64,11 @@ int RtpSend::packGet(void *outBuf, int bufSize,int *outSize)
         }
         if (this->nalu.len <= this->maxPktLen)    // no need to fragment
         {
-//            nalu_header *nalu_hdr;
-            int ytt = 0;
-            qDebug()<<&nalu_hdr;
-            qDebug()<<&(this->nalu_hdr);
-            int yg = 2;
-//            nalu_hdr =(nalu_header*)&sendBuf[0];
-            nalu_hdr->F = this->nalu.forbidden_bit;
-            nalu_hdr->NRI = this->nalu.nal_reference_idc;
-            nalu_hdr->TYPE = this->nalu.nal_unit_type;
+            nalu_header *nalu_hdr_;
+            nalu_hdr_ =(nalu_header*)&sendBuf[0];
+            nalu_hdr_->F = this->nalu.forbidden_bit;
+            nalu_hdr_->NRI = this->nalu.nal_reference_idc;
+            nalu_hdr_->TYPE = this->nalu.nal_unit_type;
             *outSize = this->nalu.len + 12;
             if (bufSize < *outSize)    // check size
             {
@@ -82,7 +78,7 @@ int RtpSend::packGet(void *outBuf, int bufSize,int *outSize)
             }
             naluPayload=&sendBuf[1];
             memcpy(naluPayload, this->nalu.data + 1, this->nalu.len - 1);    // exclude the nalu header
-            if(nalu_hdr->TYPE==1 || nalu_hdr->TYPE==5)
+            if(nalu_hdr_->TYPE==1 || nalu_hdr_->TYPE==5)
             {
                 status = session->SendPacket((void *)sendBuf,this->nalu.len,H264,true,90000/FRAMERATE);
             }
@@ -94,7 +90,7 @@ int RtpSend::packGet(void *outBuf, int bufSize,int *outSize)
             {
                 qDebug()<<"error single NALU";
 //                std::cerr << RTPGetErrorString(status) << std::endl;
-                exit(-1);
+//                exit(-1);
             }
             this->naluComplete = 1;
             return 1;
@@ -133,7 +129,7 @@ int RtpSend::packGet(void *outBuf, int bufSize,int *outSize)
             if (status < 0)
             {
                 qDebug()<<"error first FUs";
-                exit(-1);
+//                exit(-1);
             }
             this->naluComplete = 0;    // not complete
             this->FUIndex++;
@@ -165,7 +161,7 @@ int RtpSend::packGet(void *outBuf, int bufSize,int *outSize)
             if (status < 0)
             {
               qDebug()<<"error last FUs,,,163";
-              exit(-1);
+//              exit(-1);
             }
             this->naluComplete = 1;    // this nalu is complete
             this->FUIndex = 0;
@@ -194,7 +190,7 @@ int RtpSend::packGet(void *outBuf, int bufSize,int *outSize)
             if (status < 0)
             {
                 qDebug()<<"error middle FUs,,,192";
-                exit(-1);
+//                exit(-1);
             }
             this->FUIndex++;
             return 1;
