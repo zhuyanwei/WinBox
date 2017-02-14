@@ -31,6 +31,7 @@ Widget::~Widget()
         free(TC);
     }
     delete ui;
+    qDebug()<<"+++ all finished";
 }
 
 void Widget::showLocalPic()
@@ -69,10 +70,10 @@ void Widget::on_B_OpenCam()
 
     isStart = true;
     TC = new ThreadCamera(&session);
-    vid = new Video();
+    vid = new Video(&session);
     connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()));
-    connect(vid,SIGNAL(decodeDone()),this,SLOT(showRemotePic()));
-    connect(TC,SIGNAL(sendDone(void*,int)),vid,SLOT(readingFrame(void*,int)));
+    connect(vid,SIGNAL(getFrame()),this,SLOT(showRemotePic()));
+//    connect(TC,SIGNAL(sendDone(void*,int)),vid,SLOT(readingFrame(void*,int)));
     TC->start();
 }
 
@@ -115,6 +116,14 @@ void Widget::on_B_Initial()
     session.SetDefaultPayloadType(H264);
     session.SetDefaultMark(false);
     session.SetDefaultTimestampIncrement(90000.0 /FRAMERATE);
+    //add des ip and port
+    std::string ipStr = "127.0.0.1";
+    uint32_t destIp = inet_addr(ipStr.c_str());
+    destIp = ntohl(destIp);
+    uint16_t desPort = 8090;
+    RTPIPv4Address addr(destIp,desPort);
+    status = session.AddDestination(addr);
+    checkError(status);
 
 //    udpSocket = new QUdpSocket(this);
 //    port = 8080;
@@ -164,37 +173,33 @@ void Widget::on_B_Test()
     tp.SetPortbase(basePort);
     status = se.Create(sp,&tp);
     checkError(status);
-
     RTPIPv4Address addr(destIp,desPort);
     status = se.AddDestination(addr);
     checkError(status);
-
     for(int i = 1;i <= num;i++)
     {
         status = se.SendPacket((void *)"1234567890",10,0,false,10);
-    }
-
-    //receive part
-    done = false;
-    se.BeginDataAccess();
-    if (se.GotoFirstSourceWithData())
-    {
-        do
+        checkError(status);
+        //receive part
+        done = false;
+        se.BeginDataAccess();
+        if (se.GotoFirstSourceWithData())
         {
-            RTPPacket *pack;
-            while ((pack = se.GetNextPacket()) != NULL)
+            do
             {
-                qDebug()<<"receive";
-                qDebug()<<pack->GetSSRC();
-                ui->T_Test->setText("receive");
+                RTPPacket *pack;
+                while ((pack = se.GetNextPacket()) != NULL)
+                {
+                    qDebug()<<"receive";
+                    qDebug()<<pack->GetSSRC();
+                    ui->T_Test->setText("receive");
 
-                se.DeletePacket(pack);
-            }
-        } while (se.GotoNextSourceWithData());
+                    se.DeletePacket(pack);
+                }
+            } while (se.GotoNextSourceWithData());
+        }
+        se.EndDataAccess();
     }
-    se.EndDataAccess();
-
-
 }
 
 bool Widget::checkError(int rtpErr)

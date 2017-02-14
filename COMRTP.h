@@ -8,4 +8,7 @@
 #include <jrtplib3/rtptimeutilities.h>
 #include <jrtplib3/rtppacket.h>
 
+#include <QtNetwork/QUdpSocket>
+#include <QtNetwork/QNetworkInterface>
+
 #endif // COMRTP_H

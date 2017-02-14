@@ -1,88 +1,128 @@
 #include "Video.h"
 
-Video::Video()
+Video::Video(RTPSession *session)
 {
-    deR = new Decode();
+    rtpSess = session;
+    timer   = new QTimer(this);
+    rtpReR =new RtpReceive();
+    rtpReT =new RtpReceive();
+    deR =new Decode();
+    deT =new Decode();
+//    ad = *audecode;
+    receiveBytes = 0;
+    totalSizeR = 0;
+    totalSizeT = 0;
+    marker = false;
+
     ret=deR->decodeOpen();
     ret=deR->convertOpen2();
+    ret=deT->decodeOpen();
+    ret=deT->convertOpen2();
+    recvBufR = (char *) malloc(MAXDATASIZE);
+    recvBufT = (char *) malloc(MAXDATASIZE);
+    recvBufa = (char *) malloc(MAXDATASIZE);
+
+    connect(timer, SIGNAL(timeout()), this, SLOT(readingFrame()));
+    timer->start(1);
+    updateR = false;
+    updateT = false;
 }
 
 Video::~Video()
 {
-
+    deR->decodeClose();
+    rtpReR->netClose();
+    deT->decodeClose();
+    rtpReT->netClose();
+    free(recvBufR);
+    free(recvBufT);
 }
 
-void Video::readingFrame(void *buf,int len)
+void checkError( int errorCode )
 {
-    qDebug()<<"readingFrame start";
-    deR->decodeDo(buf,len,&disBufR);
-    emit decodeDone();
+    if (errorCode < 0)
+    {
+        qDebug()<<"!!!!!!This is rtp error---"<<errorCode;
+        QString yui = QString::fromStdString(RTPGetErrorString(errorCode));
+        qDebug()<<yui;
+    }
+    else
+    {
+        qDebug()<<"no rtp error";
+    }
 }
 
-//void Video::readingFrame()
+//void Video::readingFrame(void *buf,int len)
 //{
-//    rtpsess->BeginDataAccess();
-//    if( rtpsess->GotoFirstSourceWithData() )
-//    {
-//        do
-//        {
-//            while( ( rtppack = rtpsess->GetNextPacket() ) != NULL )
-//            {
-//                if (rtppack->GetPayloadType() == AAC)
-//                {
-//                   receive_bytes = rtppack->GetPayloadLength();
-//                   recv_bufa = (char *)rtppack->GetPayloadData();
-//                   ad->decode_do(recv_bufa,receive_bytes);
-//                }
-//                else if (rtppack->GetPayloadType() == H264)
-//                {
-//                    uint32_t packssrc = rtppack->GetSSRC();
-//                    int number=0;
-//                    if (packssrc == ssrc[0]) number = 1;
-//                    else if(packssrc == ssrc[1]) number = 2;
-//                    switch (number)
-//                    {
-//                        case 1:
-//                        {
-//                            receive_bytes = rtppack->GetPayloadLength();
-//                            totalsize1 += receive_bytes;
-//                            recv_buf1 = (char *)rtppack->GetPayloadData();
-//                            marker = rtppack->HasMarker();
-//                            if(rr1->rtp_unpackage(recv_buf1,receive_bytes,marker,&de_buf1,&de_len) == 1)
-//                            {
-//                                if (de1->decode_do(de_buf1,de_len,&dis_buf1) ==1)
-//                                {
-//                                    update1 = true;
-//                                    emit getframe();
-//                                }
-//                            }
-//                            break;
-//                        }
-//                        case 2:
-//                        {
-//                            receive_bytes = rtppack->GetPayloadLength();
-//                            totalsize2 += receive_bytes;
-//                            recv_buf2 = (char *)rtppack->GetPayloadData();
-//                            marker = rtppack->HasMarker();
-//                            if(rr2->rtp_unpackage(recv_buf2,receive_bytes,marker,&de_buf2,&de_len) == 1)
-//                            {
-//                                if (de2->decode_do(de_buf2,de_len,&dis_buf2) ==1)
-//                                {
-//                                    update2 = true;
-//                                    emit getframe();
-//                                }
-//                            }
-//                            break;
-//                        }
-//                    }
-//                }
-//            rtpsess->DeletePacket( rtppack );
-//            }
-//        }
-//        while( rtpsess->GotoNextSourceWithData() );
-//    }
-//    rtpsess->EndDataAccess();
+//    qDebug()<<"readingFrame start";
+//    deR->decodeDo(buf,len,&disBufR);
+//    emit decodeDone();
 //}
+
+void Video::readingFrame()
+{
+    rtpSess->BeginDataAccess();
+    if( rtpSess->GotoFirstSourceWithData() )
+    {
+        do
+        {
+            while( ( rtpPack = rtpSess->GetNextPacket() ) != NULL )
+            {
+                if (rtpPack->GetPayloadType() == AAC)
+                {
+                   receiveBytes = rtpPack->GetPayloadLength();
+                   recvBufa = (char *)rtpPack->GetPayloadData();
+//                   ad->decode_do(recv_bufa,receive_bytes);
+                }
+                else if (rtpPack->GetPayloadType() == H264)
+                {
+                    uint32_t packssrc = rtpPack->GetSSRC();
+                    int number=0;
+                    if (packssrc == ssrc[0]) number = 1;
+                    else if(packssrc == ssrc[1]) number = 2;
+                    switch (number)
+                    {
+                        case 1:
+                        {
+                            receiveBytes = rtpPack->GetPayloadLength();
+                            totalSizeR += receiveBytes;
+                            recvBufR = (char *)rtpPack->GetPayloadData();
+                            marker = rtpPack->HasMarker();
+                            if(rtpReR->rtpUnpackage(recvBufR,receiveBytes,marker,&deBufR,&deLen) == 1)
+                            {
+                                if (deR->decodeDo(deBufR,deLen,&disBufR) ==1)
+                                {
+                                    updateR = true;
+                                    emit getFrame();
+                                }
+                            }
+                            break;
+                        }
+                        case 2:
+                        {
+                            receiveBytes = rtpPack->GetPayloadLength();
+                            totalSizeT += receiveBytes;
+                            recvBufT = (char *)rtpPack->GetPayloadData();
+                            marker = rtpPack->HasMarker();
+                            if(rtpReT->rtpUnpackage(recvBufT,receiveBytes,marker,&deBufT,&deLen) == 1)
+                            {
+                                if (deT->decodeDo(deBufT,deLen,&disBufT) ==1)
+                                {
+                                    updateT = true;
+                                    emit getFrame();
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            rtpSess->DeletePacket( rtpPack );
+            }
+        }
+        while( rtpSess->GotoNextSourceWithData() );
+    }
+    rtpSess->EndDataAccess();
+}
 
 void Video::showRemoteWindow()
 {
