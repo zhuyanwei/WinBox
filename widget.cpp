@@ -108,11 +108,12 @@ void Widget::on_B_Initial()
     sessionPara.SetMaximumPacketSize(MAXDATASIZE);
     //set baseport
 //    uint16_t baseport = ui->baseport->text().toInt();
-    uint16_t baseport = 8090;
+    uint16_t baseport = 102;
     transPara.SetPortbase(baseport);
     portList[0] = baseport;
 //    sessionPara.SetMulticastTTL(255);
     status = session.Create(sessionPara,&transPara);
+    checkError(status);
     session.SetDefaultPayloadType(H264);
     session.SetDefaultMark(false);
     session.SetDefaultTimestampIncrement(90000.0 /FRAMERATE);
@@ -120,10 +121,12 @@ void Widget::on_B_Initial()
     std::string ipStr = "127.0.0.1";
     uint32_t destIp = inet_addr(ipStr.c_str());
     destIp = ntohl(destIp);
-    uint16_t desPort = 8090;
+    uint16_t desPort = 102;
     RTPIPv4Address addr(destIp,desPort);
     status = session.AddDestination(addr);
     checkError(status);
+    int i = 1;
+    i = 2;
 
 //    udpSocket = new QUdpSocket(this);
 //    port = 8080;
@@ -153,53 +156,68 @@ void Widget::on_B_Test()
 //    ui->T_Test->setText("LocalWindow");
     //send part
 
-    uint16_t basePort,desPort;
-    uint32_t destIp;
-    std::string ipStr;
-    int status,num;
-    bool done;
+    RTPSession sess;
+    uint16_t portbase,destport;
+    uint32_t destip;
+    std::string ipstr;
+    int status,i,num;
 
-    num = 10;
-    basePort = 80;
-    desPort = 80;
-    ipStr = "127.0.0.1";
-    destIp = inet_addr(ipStr.c_str());
-    destIp = ntohl(destIp);
-
-    RTPSession se;
-    RTPSessionParams sp;
-    sp.SetOwnTimestampUnit(1.0/10.0);
-    RTPUDPv4TransmissionParams tp;
-    tp.SetPortbase(basePort);
-    status = se.Create(sp,&tp);
-    checkError(status);
-    RTPIPv4Address addr(destIp,desPort);
-    status = se.AddDestination(addr);
-    checkError(status);
-    for(int i = 1;i <= num;i++)
+    portbase = 98;
+    ipstr = "127.0.0.1";
+    destip = inet_addr(ipstr.c_str());
+    if (destip == INADDR_NONE)
     {
-        status = se.SendPacket((void *)"1234567890",10,0,false,10);
+        qDebug()<< "Bad IP address specified" ;
+    }
+    destip = ntohl(destip);
+    destport = 98;
+    num = 10;
+
+    RTPUDPv4TransmissionParams transparams;
+    RTPSessionParams sessparams;
+
+    sessparams.SetOwnTimestampUnit(1.0/10.0);
+    sessparams.SetAcceptOwnPackets(true);
+    transparams.SetPortbase(portbase);
+    status = sess.Create(sessparams,&transparams);
+    checkError(status);
+
+    RTPIPv4Address addr(destip,destport);
+
+    status = sess.AddDestination(addr);
+    checkError(status);
+
+    for (i = 1 ; i <= num ; i++)
+    {
+        qDebug("\nSending packet %d/%d\n",i,num);
+        status = sess.SendPacket((void *)"1234567890",10,0,false,10);
         checkError(status);
-        //receive part
-        done = false;
-        se.BeginDataAccess();
-        if (se.GotoFirstSourceWithData())
+
+        sess.BeginDataAccess();
+
+        if (sess.GotoFirstSourceWithData())
         {
             do
             {
                 RTPPacket *pack;
-                while ((pack = se.GetNextPacket()) != NULL)
-                {
-                    qDebug()<<"receive";
-                    qDebug()<<pack->GetSSRC();
-                    ui->T_Test->setText("receive");
 
-                    se.DeletePacket(pack);
+                while ((pack = sess.GetNextPacket()) != NULL)
+                {
+                    // You can examine the data here
+                    qDebug()<<"Got packet !";
+                    sess.DeletePacket(pack);
                 }
-            } while (se.GotoNextSourceWithData());
+            } while (sess.GotoNextSourceWithData());
         }
-        se.EndDataAccess();
+        sess.EndDataAccess();
+#ifndef RTP_SUPPORT_THREAD
+        status = sess.Poll();
+        checkError(status);
+#endif // RTP_SUPPORT_THREAD
+        RTPTime::Wait(RTPTime(1,0));
     }
+    sess.BYEDestroy(RTPTime(10,0),0,0);
+
 }
 
 bool Widget::checkError(int rtpErr)

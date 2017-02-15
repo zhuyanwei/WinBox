@@ -61,6 +61,9 @@ void checkError( int errorCode )
 
 void Video::readingFrame()
 {
+#ifndef RTP_SUPPORT_THREAD
+    status = rtpSess->Poll();
+#endif // RTP_SUPPORT_THREAD
     rtpSess->BeginDataAccess();
     if( rtpSess->GotoFirstSourceWithData() )
     {
@@ -77,7 +80,7 @@ void Video::readingFrame()
                 else if (rtpPack->GetPayloadType() == H264)
                 {
                     uint32_t packssrc = rtpPack->GetSSRC();
-                    int number=0;
+                    int number= 1;
                     if (packssrc == ssrc[0]) number = 1;
                     else if(packssrc == ssrc[1]) number = 2;
                     switch (number)
