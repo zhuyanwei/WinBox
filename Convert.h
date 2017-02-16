@@ -4,8 +4,8 @@
 #include <QObject>
 #include <assert.h>
 #include <QDebug.h>
-#include <highgui.h>
-#include <cv.h>
+#include <opencv/highgui.h>
+#include <opencv/cv.h>
 
 #include "COMDEF.h"
 #include "FFMPEG_COMMON.h"

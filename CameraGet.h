@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QDebug>
-#include <highgui.h>
-#include <cv.h>
+#include <opencv/highgui.h>
+#include <opencv/cv.h>
 
 namespace Ui {
 class CameraGet;

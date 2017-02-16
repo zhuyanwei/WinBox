@@ -11,6 +11,13 @@ Widget::Widget(QWidget *parent) :
     WSADATA dat;
     WSAStartup(MAKEWORD(2,2),&dat);
 #endif
+    timer = new QTimer(this);
+    mg = new MicGet();
+    ea = new EncodeAU();
+    da = new DecodeAU();
+    ea->encodeAUOpen();
+    da->decodeAUOpen();
+    mg->initAudio(&ea->auinFifo,&da->auoutFifo);
 
     //connect sigmal and slot
     connect(ui->B_Initial,SIGNAL(clicked()),this,SLOT(on_B_Initial()));
@@ -18,6 +25,12 @@ Widget::Widget(QWidget *parent) :
     connect(ui->B_CloseCam,SIGNAL(clicked()),this,SLOT(on_B_CloseCam()));
     connect(ui->B_Pause,SIGNAL(clicked()),this,SLOT(on_B_Pause()));
     connect(ui->B_Test,SIGNAL(clicked()),this,SLOT(on_B_Test()));
+
+    connect(timer, SIGNAL(timeout()), this, SLOT(proAudio()));
+    timer->start(10);
+
+    isStart = 0;
+    isStart2 = 0;
 }
 
 Widget::~Widget()
@@ -50,7 +63,6 @@ void Widget::showLocalPic()
 
 void Widget::showRemotePic()
 {
-    qDebug()<<"showRemotePic start";
     imgRemote = QImage((const uchar*)vid->disBufR,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
     ui->L_RemoteWindow->setPixmap(QPixmap::fromImage(imgRemote));
 }
@@ -58,23 +70,14 @@ void Widget::showRemotePic()
 void Widget::on_B_OpenCam()
 {
     qDebug()<<"B_OpenCam clicked";
-//    isStart = true;
-//    TC = new ThreadCamera();
-//    connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()));
-//    TC->start();
-
-//    vid = new Video();
-//    connect(vid,SIGNAL(decodeDone()),this,SLOT(showRemotePic()));
-//    connect(TC,SIGNAL(sendDone()),vid,SLOT(readingFrame(TC->encBuf,TC->encLen)));
-////    vid->readingFrame(TC->encBuf,TC->encLen);
-
-    isStart = true;
     TC = new ThreadCamera(&session);
+    TM = new ThreadMic(mg);
     vid = new Video(&session);
     connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()));
     connect(vid,SIGNAL(getFrame()),this,SLOT(showRemotePic()));
-//    connect(TC,SIGNAL(sendDone(void*,int)),vid,SLOT(readingFrame(void*,int)));
     TC->start();
+    TM->start();
+    isStart = true;
 }
 
 void Widget::on_B_CloseCam()
@@ -84,6 +87,11 @@ void Widget::on_B_CloseCam()
     TC->stop();
     TC->sleep(2);
     TC->~ThreadCamera();
+
+    TM->stop();
+    TM->sleep(1);
+    TM->~ThreadMic();
+
     ui->L_LocalWindow->setText("LocalWindow");
 }
 
@@ -108,12 +116,11 @@ void Widget::on_B_Initial()
     sessionPara.SetMaximumPacketSize(MAXDATASIZE);
     //set baseport
 //    uint16_t baseport = ui->baseport->text().toInt();
-    uint16_t baseport = 102;
+    uint16_t baseport = 100;
     transPara.SetPortbase(baseport);
     portList[0] = baseport;
 //    sessionPara.SetMulticastTTL(255);
     status = session.Create(sessionPara,&transPara);
-    checkError(status);
     session.SetDefaultPayloadType(H264);
     session.SetDefaultMark(false);
     session.SetDefaultTimestampIncrement(90000.0 /FRAMERATE);
@@ -121,12 +128,10 @@ void Widget::on_B_Initial()
     std::string ipStr = "127.0.0.1";
     uint32_t destIp = inet_addr(ipStr.c_str());
     destIp = ntohl(destIp);
-    uint16_t desPort = 102;
+    uint16_t desPort = 100;
     RTPIPv4Address addr(destIp,desPort);
     status = session.AddDestination(addr);
     checkError(status);
-    int i = 1;
-    i = 2;
 
 //    udpSocket = new QUdpSocket(this);
 //    port = 8080;
@@ -234,4 +239,242 @@ bool Widget::checkError(int rtpErr)
         qDebug()<<"no rtp error";
         return true;
     }
+}
+
+void Widget::addDest(uint32_t dest_ip,uint16_t dest_port)
+{
+    dest_ip = ntohl(dest_ip);
+    RTPIPv4Address addr(dest_ip,dest_port);
+    status = session.AddDestination(addr);
+    checkError(status);
+}
+
+void Widget::sendMessage(MessageType type,char* destip)
+{
+//    QByteArray data;
+//    QDataStream out(&data,QIODevice::WriteOnly);
+//    out<<type;
+//    switch(type)
+//    {
+//        case Request:
+//        {
+//            QString name = QHostInfo::localHostName();
+//            out<<name<<ipList[0]<<portList[0]<<ssrcList[0];
+//            port = 8080;
+//            break;
+//        }
+//        case Callback:
+//        {
+//            out<<isStart2<<ipList[0]<<portList[0]<<ssrcList[0];
+//            port = 8080;
+//            break;
+//        }
+//        case Callback2:
+//        {
+//            port = 8080;
+//            break;
+//        }
+//        case Invite:
+//        {
+//            out<<ipList[0]<<portList[0]<<ssrcList[0]<<ipList[1]<<portList[1]<<ssrcList[1];
+//            port = 8080;
+//            break;
+//        }
+//        case CutIn:
+//        {
+//            out<<QCIp<<QCPort;
+//            port = 8080;
+//            break;
+//        }
+//        case CutInCB:
+//        {
+//            out<<ssrcList[0]<<ssrcList[1]<<ssrcList[2];
+//            port = 8060;
+//            break;
+//        }
+//    }
+//    udpSocket->writeDatagram(data,data.length(),QHostAddress(destip),port);
+}
+
+int Widget::proAudio()
+{
+    if(isStart == 1)
+    {
+        while (av_audio_fifo_size(ea->auinFifo) >= FRAMES_PER_BUFFER)
+        {
+            ea->encodeAUDo(&aeBuf,&aeSize);
+            session.SendPacket(aeBuf,aeSize,AAC,false,FRAMES_PER_BUFFER);
+        }
+    }
+    return 0;
+}
+
+void Widget::procRequest()
+{
+//    while(udpSocket->hasPendingDatagrams())
+//    {
+//        QByteArray datagram;
+//        datagram.resize(udpSocket->pendingDatagramSize());
+//        udpSocket->readDatagram(datagram.data(),datagram.size());
+//        QDataStream in(&datagram,QIODevice::ReadOnly);
+//        int messageType;
+//        in>>messageType;
+//        switch(messageType)
+//        {
+//            case Callback:
+//            {
+//                int YesorNo;
+//                uint16_t srcport;
+//                uint32_t srcip;
+//                uint32_t ssrc;
+//                in>>YesorNo>>srcip>>srcport>>ssrc;
+//                if (YesorNo == 1)
+//                {
+//                    if (isStart == 0)
+//                    {
+//                        TC = new ThreadCamera(&session);
+//                        TM = new ThreadMic(mg);
+//                        vid = new Video(&session);
+//                        connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()));
+//                        connect(vid,SIGNAL(getFrame()),this,SLOT(showRemotePic()));
+//                        TC->start();
+//                        TM->start();
+//                        isStart = true;
+
+//                        addDest(m_ip,m_port);
+//                        TC = new ThreadCamera(&session);
+//                        connect(TC,SIGNAL(captured()),this,SLOT(update()));
+//                        isStart = 1;
+//                        CT->start();
+//                        TM = new ThreadMic(mg);
+//                        TM->start();
+//                        ipList[1] = srcip;
+//                        portList[1] = srcport;
+//                        ssrcList[1] = ssrc;
+//                        sleep(1);
+
+//                        Vid = new Video(this,&session,&ad);
+//                        Vid->ssrc[0]=ssrc;
+//                        Vid->show();
+//                        isStart2 =1;
+//                    }
+//                    else
+//                    {
+//                    iplist[2] =srcip;
+//                    portlist[2] = srcport;
+//                    ssrclist[2] = ssrc;
+//                    Vid->ssrc[1] = ssrc;
+//                    }
+
+//                    struct in_addr tempip;
+//                    tempip.s_addr = srcip;
+//                    char *temp_ip = inet_ntoa(tempip);
+//                    sendMessage(Callback2,temp_ip);
+//                }
+//                else if (YesorNo == 0)
+//                {
+//                    QMessageBox::information(this,"Refused","Refused!!");
+//                }
+//                break;
+//            }
+//            case Request:
+//            {
+//                QString name;
+//                uint16_t srcport;
+//                uint32_t srcip;
+//                uint32_t ssrc;
+//                in>>name>>srcip>>srcport>>ssrc;
+
+//                int btn = QMessageBox::information(this,"Request",tr("Request from%1").arg(name),QMessageBox::Yes,QMessageBox::No);
+//                if (btn == QMessageBox::Yes)
+//                {
+//                    add_dest(m_ip,m_port);
+//    //                add_dest(srcip,srcport);
+
+//                    iplist[1] = srcip;
+//                    portlist[1] = srcport;
+//                    ssrclist[1] = ssrc;
+
+//                    Vid = new Video(this,&session,&ad);
+//                    Vid->ssrc[0] = ssrc;
+//                    Vid->show();
+//                    isStart2 =1;
+//                }
+//                else if (btn == QMessageBox::No)
+//                {
+//                    isStart2 = 0;
+//                }
+//                struct in_addr tempip;
+//                tempip.s_addr = srcip;
+//                char *temp_ip= inet_ntoa(tempip);
+//                sendMessage(Callback,temp_ip);
+
+//                break;
+//            }
+//            case Callback2:
+//            {
+//                if (isStart == 0)
+//                {
+//                CT = new CameraThread(&session);
+//                connect(CT,SIGNAL(captured()),this,SLOT(update()),Qt::BlockingQueuedConnection);
+//                isStart = 1;
+//                CT->start();
+
+//                AT = new AudioThread(au);
+//                AT->start();
+//                }
+
+//                break;
+//            }
+//            case Invite:
+//            {
+//            in>>iplist[1]>>portlist[1]>>ssrclist[1]>>iplist[2]>>portlist[2]>>ssrclist[2];
+//            int btn = QMessageBox::information(this,"Invitation","invitation",QMessageBox::Yes,QMessageBox::No);
+//            if (btn == QMessageBox::Yes)
+//            {
+//                add_dest(m_ip,m_port);
+//    //            add_dest(iplist[1],portlist[1]);
+//    //            add_dest(iplist[2],portlist[2]);
+
+//                Vid = new Video(this,&session,&ad);
+//                Vid->ssrc[0] = ssrclist[1];
+//                Vid->ssrc[1] = ssrclist[2];
+//                Vid->show();
+//                isStart2 =1;
+//            }
+//            else if (btn == QMessageBox::No)
+//            {
+//                isStart2 = 0;
+//            }
+//            struct in_addr tempip;
+//            tempip.s_addr = iplist[1];
+//            char *temp_ip= inet_ntoa(tempip);
+//            sendMessage(Callback,temp_ip);
+//            tempip.s_addr = iplist[2];
+//            temp_ip= inet_ntoa(tempip);
+//            sendMessage(Callback,temp_ip);
+//            break;
+//            }
+//            case CutIn:
+//            {
+//                in>>QCip>>QCport;
+//    //            add_dest(QCip,QCport);
+//                if (isServer == 1)
+//                {
+//                struct in_addr tempip;
+//                tempip.s_addr = iplist[1];
+//                char *temp_ip= inet_ntoa(tempip);
+//                sendMessage(CutIn,temp_ip);
+//                tempip.s_addr = iplist[2];
+//                temp_ip= inet_ntoa(tempip);
+//                sendMessage(CutIn,temp_ip);
+//                tempip.s_addr = QCip;
+//                temp_ip= inet_ntoa(tempip);
+//                sendMessage(CutInCB,temp_ip);
+//                }
+
+//                break;
+//            }
+//        }
+//    }
 }

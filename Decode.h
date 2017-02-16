@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QDebug>
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
 #include <COMDEF.h>
 #include <FFMPEG_COMMON.h>
 
