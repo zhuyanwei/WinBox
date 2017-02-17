@@ -18,7 +18,7 @@
     <rect>
      <x>61</x>
      <y>570</y>
-     <width>369</width>
+     <width>543</width>
      <height>26</height>
     </rect>
    </property>
@@ -48,6 +48,20 @@
      <widget class="QPushButton" name="B_Pause">
       <property name="text">
        <string>Pause</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="B_Invite">
+      <property name="text">
+       <string>Invite</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="B_Add">
+      <property name="text">
+       <string>Add</string>
       </property>
      </widget>
     </item>
@@ -84,7 +98,11 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="I_RemoteIP"/>
+     <widget class="QLineEdit" name="I_RemoteIP">
+      <property name="text">
+       <string>10.20.5.3</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QLabel" name="label_4">
@@ -94,7 +112,11 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="I_RemotePort"/>
+     <widget class="QLineEdit" name="I_RemotePort">
+      <property name="text">
+       <string>230</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QPushButton" name="B_Connect">
@@ -123,7 +145,11 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="I_LocalPort"/>
+     <widget class="QLineEdit" name="I_LocalPort">
+      <property name="text">
+       <string>220</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QLabel" name="label_2">
@@ -133,7 +159,11 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="I_SSRC"/>
+     <widget class="QLineEdit" name="I_SSRC">
+      <property name="text">
+       <string>22</string>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QPushButton" name="B_Initial">

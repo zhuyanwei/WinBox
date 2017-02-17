@@ -4,7 +4,9 @@
 #include <QWidget>
 #include <QImage>
 #include <QTime>
+#include <QString>
 #include <QDebug>
+#include <QMessageBox>
 #include <winsock2.h>
 #include <QtNetwork/QHostInfo>
 #include <QtNetwork/QUdpSocket>
@@ -34,11 +36,13 @@ private slots:
     void on_B_CloseCam();
     void on_B_Pause();
     void on_B_Initial();
+    void on_B_Connect();
+    void on_B_Invite();
+    void on_B_Add();
     void on_B_Test();
     void showLocalPic();
-    void showRemotePic();
     int proAudio();
-    void procRequest();
+    void proRequest();
 
 private:
     bool checkError(int rtpErr);
@@ -56,7 +60,7 @@ private:
     int aeSize;
     QTimer *timer;
 
-    bool isStart,isStart2;
+    bool isStart,isStart2,isServer;
     QTimer *timerCam;
     QImage *img;
     QImage imgLocal;
