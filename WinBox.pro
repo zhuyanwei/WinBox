@@ -19,13 +19,13 @@ SOURCES += main.cpp\
     Decode.cpp \
     ThreadCamera.cpp \
     Convert.cpp \
-    Video.cpp \
     RtpSend.cpp \
     RtpReceive.cpp \
     MicGet.cpp \
     ThreadMic.cpp \
     EncodeAU.cpp \
-    DecodeAU.cpp
+    DecodeAU.cpp \
+    Show.cpp
 
 HEADERS  += widget.h \
     CameraGet.h \
@@ -35,16 +35,17 @@ HEADERS  += widget.h \
     COMDEF.h \
     FFMPEG_COMMON.h \
     Convert.h \
-    Video.h \
     RtpSend.h \
     COMRTP.h \
     RtpReceive.h \
     MicGet.h \
     ThreadMic.h \
     EncodeAU.h \
-    DecodeAU.h
+    DecodeAU.h \
+    Show.h
 
-FORMS    += widget.ui
+FORMS    += widget.ui \
+    Show.ui
 
 INCLUDEPATH += D:\OpenCV\install\include \
 D:\ffmpeg322\include \

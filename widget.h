@@ -13,7 +13,7 @@
 #include "ThreadMic.h"
 #include "EncodeAU.h"
 #include "DecodeAU.h"
-#include "Video.h"
+#include "Show.h"
 
 namespace Ui {
 class Widget;
@@ -48,7 +48,7 @@ private:
     Ui::Widget *ui;
     ThreadCamera *TC;
     ThreadMic *TM;
-    Video *vid;
+    Show *sh;
     MicGet *mg;
     EncodeAU *ea;
     DecodeAU *da;

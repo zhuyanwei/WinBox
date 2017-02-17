@@ -1,14 +1,19 @@
-#include "Video.h"
+#include "Show.h"
+#include "ui_Show.h"
 
-Video::Video(RTPSession *session)
+Show::Show(QWidget *parent ,RTPSession *session,DecodeAU **audecode ) :
+    QDialog(parent),
+    ui(new Ui::Show)
 {
+    ui->setupUi(this);
+
     rtpSess = session;
     timer   = new QTimer(this);
     rtpReR =new RtpReceive();
     rtpReT =new RtpReceive();
     deR =new Decode();
     deT =new Decode();
-//    ad = *audecode;
+    da = *audecode;
     receiveBytes = 0;
     totalSizeR = 0;
     totalSizeT = 0;
@@ -22,13 +27,14 @@ Video::Video(RTPSession *session)
     recvBufT = (char *) malloc(MAXDATASIZE);
     recvBufa = (char *) malloc(MAXDATASIZE);
 
+    connect(this, SIGNAL(getFrame()), this, SLOT(showAllWindow()));
     connect(timer, SIGNAL(timeout()), this, SLOT(readingFrame()));
     timer->start(1);
     updateR = false;
     updateT = false;
 }
 
-Video::~Video()
+Show::~Show()
 {
     deR->decodeClose();
     rtpReR->netClose();
@@ -36,9 +42,10 @@ Video::~Video()
     rtpReT->netClose();
     free(recvBufR);
     free(recvBufT);
+    delete ui;
 }
 
-void checkError( int errorCode )
+void Show::checkError( int errorCode )
 {
     if (errorCode < 0)
     {
@@ -52,18 +59,11 @@ void checkError( int errorCode )
     }
 }
 
-//void Video::readingFrame(void *buf,int len)
-//{
-//    qDebug()<<"readingFrame start";
-//    deR->decodeDo(buf,len,&disBufR);
-//    emit decodeDone();
-//}
-
-void Video::readingFrame()
+void Show::readingFrame()
 {
 #ifndef RTP_SUPPORT_THREAD
     status = rtpSess->Poll();
-#endif // RTP_SUPPORT_THREAD
+#endif
     rtpSess->BeginDataAccess();
     if( rtpSess->GotoFirstSourceWithData() )
     {
@@ -75,7 +75,7 @@ void Video::readingFrame()
                 {
                    receiveBytes = rtpPack->GetPayloadLength();
                    recvBufa = (char *)rtpPack->GetPayloadData();
-//                   ad->decode_do(recv_bufa,receive_bytes);
+                   da->decodeAUDo(recvBufa,receiveBytes);
                 }
                 else if (rtpPack->GetPayloadType() == H264)
                 {
@@ -127,7 +127,18 @@ void Video::readingFrame()
     rtpSess->EndDataAccess();
 }
 
-void Video::showRemoteWindow()
+void Show::showAllWindow()
 {
-
+    if (updateR)
+    {
+        QImage image = QImage((const uchar*)disBufR,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
+        ui->L_RemoteWindow->setPixmap(QPixmap::fromImage(image));
+        updateR = false;
+    }
+    if (updateT)
+    {
+        QImage image2 = QImage((const uchar*)disBufT,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
+        ui->L_ThirdWindow->setPixmap(QPixmap::fromImage(image2));
+        updateT = false;
+    }
 }

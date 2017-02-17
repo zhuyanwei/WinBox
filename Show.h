@@ -1,27 +1,32 @@
-#ifndef VIDEO_H
-#define VIDEO_H
+#ifndef SHOW_H
+#define SHOW_H
 
 #include <QObject>
 #include <QDebug>
 #include <QTimer>
+#include <QDialog>
 #include "RtpReceive.h"
 #include "Decode.h"
+#include "DecodeAU.h"
 
 namespace Ui {
-class Video;
+class Show;
 }
 
-class Video : public QObject
+class Show : public QDialog
 {
     Q_OBJECT
+
 public:
-    Video(RTPSession *session);
-    ~Video();
+    explicit Show(QWidget *parent = 0,RTPSession *session = 0,DecodeAU **audecode = 0);
+    ~Show();
 
     uint32_t ssrc[2];
     void *deBufR,*deBufT,*disBufR,*disBufT;
 
 private:
+    Ui::Show *ui;
+
     void checkError( int errorCode );
 
     int ret;
@@ -31,7 +36,7 @@ private:
     RtpReceive *rtpReT;
     Decode *deR;
     Decode *deT;
-//    au_decode *ad;
+    DecodeAU *da;
     int receiveBytes,deLen,totalSizeR,totalSizeT;
     char *recvBufR,*recvBufT,*recvBufa;
     bool marker;
@@ -41,13 +46,12 @@ private:
 
 signals:
     getFrame();
-    decodeDone();
 
 public slots:
     void readingFrame();
 
 private slots:
-    void showRemoteWindow();
+    void showAllWindow();
 };
 
-#endif // VIDEO_H
+#endif // SHOW_H

@@ -63,21 +63,25 @@ void Widget::showLocalPic()
 
 void Widget::showRemotePic()
 {
-    imgRemote = QImage((const uchar*)vid->disBufR,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
-    ui->L_RemoteWindow->setPixmap(QPixmap::fromImage(imgRemote));
+//    imgRemote = QImage((const uchar*)sh->disBufR,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
+//    ui->L_RemoteWindow->setPixmap(QPixmap::fromImage(imgRemote));
 }
 
 void Widget::on_B_OpenCam()
 {
     qDebug()<<"B_OpenCam clicked";
     TC = new ThreadCamera(&session);
-    TM = new ThreadMic(mg);
-    vid = new Video(&session);
     connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()));
-    connect(vid,SIGNAL(getFrame()),this,SLOT(showRemotePic()));
-    TC->start();
-    TM->start();
     isStart = true;
+    TC->start();
+
+    TM = new ThreadMic(mg);
+    TM->start();
+//    sleep(1);
+
+    sh = new Show(this,&session,&da);
+    sh->show();
+    isStart2 = true;
 }
 
 void Widget::on_B_CloseCam()
@@ -87,10 +91,16 @@ void Widget::on_B_CloseCam()
     TC->stop();
     TC->sleep(2);
     TC->~ThreadCamera();
+//    free(TC);
 
     TM->stop();
     TM->sleep(1);
     TM->~ThreadMic();
+//    free(TM);
+
+    isStart2 = false;
+    sh->close();
+//    free(sh);
 
     ui->L_LocalWindow->setText("LocalWindow");
 }
