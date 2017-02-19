@@ -100,7 +100,7 @@
     <item>
      <widget class="QLineEdit" name="I_RemoteIP">
       <property name="text">
-       <string>10.20.50.3</string>
+       <string>127.0.0.1</string>
       </property>
      </widget>
     </item>
@@ -114,7 +114,7 @@
     <item>
      <widget class="QLineEdit" name="I_RemotePort">
       <property name="text">
-       <string>230</string>
+       <string>220</string>
       </property>
      </widget>
     </item>

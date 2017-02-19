@@ -18,9 +18,10 @@ void ThreadMic::stop()
 
 void ThreadMic::run()
 {
-    while(!isStop)
-    {
-        mg->recordAudio();
-    }
+//    while(!isStop)
+//    {
+//        mg->recordAudio();
+//    }
+//    qDebug("threadmic out");
 }
 

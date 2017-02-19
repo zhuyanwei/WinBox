@@ -30,7 +30,7 @@ Widget::Widget(QWidget *parent) :
     connect(ui->B_Pause,SIGNAL(clicked()),this,SLOT(on_B_Pause()));
     connect(ui->B_Test,SIGNAL(clicked()),this,SLOT(on_B_Test()));
 
-    connect(timer, SIGNAL(timeout()), this, SLOT(proAudio()));
+//    connect(timer, SIGNAL(timeout()), this, SLOT(proAudio()));
     timer->start(10);
 
     isStart = 0;
