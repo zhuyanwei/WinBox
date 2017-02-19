@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -56,7 +56,7 @@ LIBS += -LD:\OpenCV\install\bin -llibopencv_core231 -llibopencv_highgui231 \
 -LD:\ffmpeg322\lib -llibavformat -llibavdevice -llibavcodec -llibavutil -llibswscale -llibswresample \
 -LD:\RTP\jrtpnothread\lib -llibjrtplib_d \
 -LD:\PA\PAnoASIO\lib -llibportaudio \
--LD:\Qt\Qt5.7.0\5.7\mingw53_32\lib -llibQt5Network \
+#-LD:\Qt\Qt5.7.0\5.7\mingw53_32\lib -llibQt5Network \
 -lws2_32
 
 

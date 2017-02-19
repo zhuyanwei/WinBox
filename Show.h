@@ -43,6 +43,7 @@ private:
     RTPSession *rtpSess;
     RTPPacket *rtpPack;
     int status, timeout;
+    QImage imageR,imageT;
 
 signals:
     getFrame();

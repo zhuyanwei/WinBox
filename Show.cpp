@@ -131,14 +131,16 @@ void Show::showAllWindow()
 {
     if (updateR)
     {
-        QImage image = QImage((const uchar*)disBufR,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
-        ui->L_RemoteWindow->setPixmap(QPixmap::fromImage(image));
+        imageR = QImage((const uchar*)disBufR,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
+        imageR = imageR.mirrored(true,false);
+        ui->L_RemoteWindow->setPixmap(QPixmap::fromImage(imageR));
         updateR = false;
     }
     if (updateT)
     {
-        QImage image2 = QImage((const uchar*)disBufT,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
-        ui->L_ThirdWindow->setPixmap(QPixmap::fromImage(image2));
+        imageT = QImage((const uchar*)disBufT,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
+        imageT = imageT.mirrored(true,false);
+        ui->L_ThirdWindow->setPixmap(QPixmap::fromImage(imageT));
         updateT = false;
     }
 }

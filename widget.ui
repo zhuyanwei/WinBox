@@ -100,7 +100,7 @@
     <item>
      <widget class="QLineEdit" name="I_RemoteIP">
       <property name="text">
-       <string>10.20.5.3</string>
+       <string>10.20.50.3</string>
       </property>
      </widget>
     </item>

@@ -8,9 +8,9 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <winsock2.h>
-#include <QtNetwork/QHostInfo>
-#include <QtNetwork/QUdpSocket>
-#include <QtNetwork/QNetworkInterface>
+#include <QHostInfo>
+#include <QUdpSocket>
+#include <QNetworkInterface>
 #include "ThreadCamera.h"
 #include "ThreadMic.h"
 #include "EncodeAU.h"
@@ -40,6 +40,7 @@ private slots:
     void on_B_Invite();
     void on_B_Add();
     void on_B_Test();
+    int slotTest();
     void showLocalPic();
     int proAudio();
     void proRequest();
@@ -75,6 +76,11 @@ private:
     uint16_t QCPort;
     int port;
     QUdpSocket *udpSocket;
+    QUdpSocket *udpS;
+    QUdpSocket *udpR;
+    int portS;
+    QHostAddress ipS;
+    int portR;
     uint32_t m_ip;
     uint16_t m_port;
     uint32_t ipList[3];

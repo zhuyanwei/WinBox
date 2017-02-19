@@ -127,12 +127,18 @@ void Widget::on_B_Initial()
 //    uint16_t baseport = 100;
     transPara.SetPortbase(baseport);
     portList[0] = baseport;
-//    sessionPara.SetMulticastTTL(255);
     status = session.Create(sessionPara,&transPara);
     session.SetDefaultPayloadType(H264);
     session.SetDefaultMark(false);
     session.SetDefaultTimestampIncrement(90000.0 /FRAMERATE);
     //add des ip and port
+    std::string ipStr = ui->I_RemoteIP->text().toStdString();
+    uint32_t destIp = inet_addr(ipStr.c_str());
+    destIp = ntohl(destIp);
+    uint16_t desPort = ui->I_RemotePort->text().toInt();
+    RTPIPv4Address addr(destIp,desPort);
+    status = session.AddDestination(addr);
+
 //    std::string ipStr = "127.0.0.1";
 //    uint32_t destIp = inet_addr(ipStr.c_str());
 //    destIp = ntohl(destIp);
@@ -140,96 +146,49 @@ void Widget::on_B_Initial()
 //    RTPIPv4Address addr(destIp,desPort);
 //    status = session.AddDestination(addr);
 
-    udpSocket = new QUdpSocket();
-    port = 8080;
-    udpSocket->bind(port,QUdpSocket::ShareAddress|QUdpSocket::ReuseAddressHint);
-    QList<QHostAddress> list = QNetworkInterface::allAddresses();
-    foreach (QHostAddress address, list)
-    {
-        if(address.protocol() == QAbstractSocket::IPv4Protocol && address.toString().contains("192.168."))
-        {
-            QByteArray ba = address.toString().toLatin1();
-            ipList[0] = inet_addr(ba.data());
-        }
-    }
-    status =session.SupportsMulticasting();
-    m_ip = inet_addr("224.1.1.1");
-    m_port = 8090;
-    RTPIPv4Address m_addr(ntohl(m_ip), m_port);
-    status = session.JoinMulticastGroup(m_addr);
-    connect(udpSocket,SIGNAL(readyRead()),this,SLOT(proRequest()));
+
+//    udpSocket = new QUdpSocket();
+//    port = 8080;
+//    udpSocket->bind(port,QUdpSocket::ShareAddress|QUdpSocket::ReuseAddressHint);
+//    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+//    foreach (QHostAddress address, list)
+//    {
+//        if(address.protocol() == QAbstractSocket::IPv4Protocol && address.toString().contains("192.168."))
+//        {
+//            QByteArray ba = address.toString().toLatin1();
+//            ipList[0] = inet_addr(ba.data());
+//        }
+//    }
+//    status =session.SupportsMulticasting();
+//    m_ip = inet_addr("224.1.1.1");
+//    m_port = 8090;
+//    RTPIPv4Address m_addr(ntohl(m_ip), m_port);
+//    status = session.JoinMulticastGroup(m_addr);
+//    connect(udpSocket,SIGNAL(readyRead()),this,SLOT(proRequest()));
+
+//    udpS = new QUdpSocket();
+//    udpR = new QUdpSocket();
+//    portS = 2001;
+//    ipS = QHostAddress("127.0.0.1");
+//    portR = 2001;
+//    udpR->bind(QHostAddress::Any, portR);
+//    connect(udpR, SIGNAL(readyRead()),this, SLOT(slotTest()));
 }
 
 void Widget::on_B_Test()
 {
-    qDebug()<<"B_Test clicked";
-//    RTPSession sess;
-//    int status;
-//    ui->T_Test->setText("LocalWindow");
-    //send part
+//    qDebug()<<"B_Test clicked";
+//    QByteArray datagram = QString("153").toUtf8();
+//    udpS->writeDatagram(datagram, datagram.size(), ipS, portS);
+}
 
-    RTPSession sess;
-    uint16_t portbase,destport;
-    uint32_t destip;
-    std::string ipstr;
-    int status,i,num;
-
-    portbase = 98;
-    ipstr = "127.0.0.1";
-    destip = inet_addr(ipstr.c_str());
-    if (destip == INADDR_NONE)
-    {
-        qDebug()<< "Bad IP address specified" ;
-    }
-    destip = ntohl(destip);
-    destport = 98;
-    num = 10;
-
-    RTPUDPv4TransmissionParams transparams;
-    RTPSessionParams sessparams;
-
-    sessparams.SetOwnTimestampUnit(1.0/10.0);
-    sessparams.SetAcceptOwnPackets(true);
-    transparams.SetPortbase(portbase);
-    status = sess.Create(sessparams,&transparams);
-    checkError(status);
-
-    RTPIPv4Address addr(destip,destport);
-
-    status = sess.AddDestination(addr);
-    checkError(status);
-
-    for (i = 1 ; i <= num ; i++)
-    {
-        qDebug("\nSending packet %d/%d\n",i,num);
-        status = sess.SendPacket((void *)"1234567890",10,0,false,10);
-        checkError(status);
-
-        sess.BeginDataAccess();
-
-        if (sess.GotoFirstSourceWithData())
-        {
-            do
-            {
-                RTPPacket *pack;
-
-                while ((pack = sess.GetNextPacket()) != NULL)
-                {
-                    // You can examine the data here
-                    qDebug()<<"Got packet !";
-                    sess.DeletePacket(pack);
-                }
-            } while (sess.GotoNextSourceWithData());
-        }
-        sess.EndDataAccess();
-#ifndef RTP_SUPPORT_THREAD
-        status = sess.Poll();
-        checkError(status);
-#endif // RTP_SUPPORT_THREAD
-        RTPTime::Wait(RTPTime(1,0));
-    }
-    sess.BYEDestroy(RTPTime(10,0),0,0);
-
+int Widget::slotTest()
+{
+//    while (udpR->hasPendingDatagrams())
+//    {
+//        qDebug()<<"received clicked";
+//    }
+//    return 0;
 }
 
 bool Widget::checkError(int rtpErr)
@@ -318,6 +277,7 @@ int Widget::proAudio()
 
 void Widget::proRequest()
 {
+    qDebug()<<"udp received";
     while(udpSocket->hasPendingDatagrams())
     {
         QByteArray datagram;
