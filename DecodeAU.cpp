@@ -41,9 +41,9 @@ int DecodeAU::decodeAUOpen()
     pFrame->format= pCodecCtx->sample_fmt;
     size = av_samples_get_buffer_size(NULL, pCodecCtx->channels,pCodecCtx->frame_size,pCodecCtx->sample_fmt, 1);
     frameBuf = (int16_t*) av_malloc(size);
-    outSize = av_samples_get_buffer_size(NULL, NUM_CHANNELS,FRAMES_PER_BUFFER,AV_SAMPLE_FMT_S16, 1);
+    outSize = av_samples_get_buffer_size(NULL, NUM_CHANNELS,FRAMES_PER_BUFFER,AVSAMPLEFMT, 1);
     outBuf =(uint8_t*) av_malloc(outSize);
-    auoutFifo = av_audio_fifo_alloc(AV_SAMPLE_FMT_S16,NUM_CHANNELS,FRAMES_PER_BUFFER * 10);
+    auoutFifo = av_audio_fifo_alloc(AVSAMPLEFMT,NUM_CHANNELS,FRAMES_PER_BUFFER * 10);
     return 0;
 }
 
@@ -70,7 +70,7 @@ int DecodeAU::decodeAUDo(void *ibuf,int ilen)
         }
         if (gotFrame >0)
         {
-            audioResampling(pCodecCtx,pFrame,AV_SAMPLE_FMT_S16,NUM_CHANNELS,SAMPLE_RATE,outBuf);
+            audioResampling(pCodecCtx,pFrame,AVSAMPLEFMT,NUM_CHANNELS,SAMPLE_RATE,outBuf);
             fwrite(outBuf,1,outSize,pcm);
             av_audio_fifo_write(auoutFifo,(void**)&outBuf,FRAMES_PER_BUFFER);
         }

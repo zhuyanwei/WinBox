@@ -46,21 +46,21 @@ Widget::~Widget()
     if(TC)
     {
         TC->stop();
-        free(TC);
+//        free(TC);
     }
     if(sh)
     {
         sh->close();
-        free(sh);
+//        free(sh);
     }
     if(TM)
     {
         TM->stop();
-        free(TM);
+//        free(TM);
     }
-    ea->encodeAUClose();
-    da->decodeAUClose();
-    mg->closeAudio();
+//    ea->encodeAUClose();
+//    da->decodeAUClose();
+//    mg->closeAudio();
 
     delete ui;
     qDebug()<<"+++ all finished";
