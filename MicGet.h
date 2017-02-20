@@ -7,12 +7,6 @@
 #include "COMDEF.h"
 #include "FFMPEG_COMMON.h"
 
-#define WRITE_TO_FILE   (0)
-#define PA_SAMPLE_TYPE  paInt16
-#define SAMPLE_SILENCE  (0)
-#define PRINTF_S_FORMAT "%d"
-
-typedef short SAMPLE;
 typedef struct
 {
     AVAudioFifo      *recordedSamples;
@@ -27,11 +21,9 @@ static int audioCallback(const void *inputBuffer,void *outputBuffer,unsigned lon
     (void) userData;
     av_audio_fifo_write(data->recordedSamples,(void**)&inputBuffer,framesPerBuffer);
     if (av_audio_fifo_size(data->receivedSamples)>=framesPerBuffer)
-    av_audio_fifo_read(data->receivedSamples,(void**)&outputBuffer,framesPerBuffer);
+        av_audio_fifo_read(data->receivedSamples,(void**)&outputBuffer,framesPerBuffer);
     return paContinue;
 }
-
-
 
 class MicGet : public QObject
 {
@@ -44,6 +36,7 @@ public:
     int closeAudio();
 
     int numBytes;
+    bool isStop;
 
 private:
     PaStreamParameters  inputPara,outputPara;

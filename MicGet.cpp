@@ -2,7 +2,7 @@
 
 MicGet::MicGet(QObject *parent) : QObject(parent)
 {
-
+    isStop = false;
 }
 
 MicGet::~MicGet()
@@ -33,7 +33,7 @@ int MicGet::initAudio(AVAudioFifo **auinFifo, AVAudioFifo **auoutFifo)
         qDebug("Error: No default input device.\n");
         goto done;
     }
-    inputPara.channelCount = 1;
+    inputPara.channelCount = NUM_CHANNELS;
     inputPara.sampleFormat = PA_SAMPLE_TYPE;
     inputPara.suggestedLatency = Pa_GetDeviceInfo( inputPara.device )->defaultLowInputLatency;
     inputPara.hostApiSpecificStreamInfo = NULL;
@@ -43,14 +43,16 @@ int MicGet::initAudio(AVAudioFifo **auinFifo, AVAudioFifo **auoutFifo)
         qDebug("Error: No default output device.\n");
         goto done;
     }
-    outputPara.channelCount = 1;
+    outputPara.channelCount = NUM_CHANNELS;
     outputPara.sampleFormat =  PA_SAMPLE_TYPE;
     outputPara.suggestedLatency = Pa_GetDeviceInfo( outputPara.device )->defaultLowOutputLatency;
     outputPara.hostApiSpecificStreamInfo = NULL;
     err = Pa_OpenStream(&stream,&inputPara, &outputPara,SAMPLE_RATE,FRAMES_PER_BUFFER,paClipOff, audioCallback,&data );
     if( err != paNoError ) goto done;
+    qDebug("+++ initAudio all clear");
     return 0;
 done:
+    qDebug("initAudio goto done");
     Pa_Terminate();
     if( data.recordedSamples ) free( data.recordedSamples );
     if( data.receivedSamples ) free( data.receivedSamples );
@@ -70,29 +72,15 @@ int MicGet::recordAudio()
     if( err != paNoError ) goto done;
     qDebug("\n=== Now recording!! Please speak into the microphone. ===\n");
     fflush(stdout);
-    while( ( err = Pa_IsStreamActive( stream ) ) == 1 )
+    while( ( err = Pa_IsStreamActive( stream ) ) == 1 && isStop == false)
     {
-        qDebug("233");
+        Pa_Sleep(1000);
+        printf("index = \n");
+        fflush(stdout);
     }
     if( err < 0 ) goto done;
     err = Pa_CloseStream( stream );
     if( err != paNoError ) goto done;
-#if WRITE_TO_FILE
-    {
-        FILE  *fid;
-        fid = fopen("recorded.raw", "wb");
-        if( fid == NULL )
-        {
-            qDebug("Could not open file.");
-        }
-        else
-        {
-            fwrite( data.recordedSamples, NUM_CHANNELS * sizeof(SAMPLE), totalFrames, fid );
-            fclose( fid );
-            qDebug("Wrote data to 'recorded.raw'\n");
-        }
-    }
-#endif
     return 0 ;
 done:
     Pa_Terminate();

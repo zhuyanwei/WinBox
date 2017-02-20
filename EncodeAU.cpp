@@ -27,9 +27,10 @@ int EncodeAU::encodeAUOpen()
         return -1;
     }
     pCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-    pCodecCtx->sample_fmt = AV_SAMPLE_FMT_FLTP;
+    pCodecCtx->sample_fmt = AVSAMPLEFMT;
     pCodecCtx->sample_rate= SAMPLE_RATE;
-    pCodecCtx->channel_layout=AV_CH_LAYOUT_STEREO;
+    pCodecCtx->channel_layout= AVCHLAYOUT;
+//    pCodecCtx->channels = NUM_CHANNELS;
     pCodecCtx->channels = av_get_channel_layout_nb_channels(pCodecCtx->channel_layout);
     pCodecCtx->bit_rate = 64000;
     int ret;
@@ -72,7 +73,7 @@ int EncodeAU::encodeAUDo(void **poBuf,int *poLen)
     ret = avcodec_encode_audio2(pCodecCtx, &pkt,pFrame, &gotFrame);
     if(ret < 0)
     {
-        qDebug()<<"Failed to encode!\n";
+        qDebug("Failed to encode!0075--%d\n",ret);
         return -1;
     }
     if (gotFrame==1)

@@ -14,14 +14,15 @@ ThreadMic::~ThreadMic()
 void ThreadMic::stop()
 {
     isStop = true;
+    mg->isStop = true;
 }
 
 void ThreadMic::run()
 {
-//    while(!isStop)
-//    {
-//        mg->recordAudio();
-//    }
-//    qDebug("threadmic out");
+    while(!isStop)
+    {
+        mg->recordAudio();
+    }
+    qDebug("threadmic out");
 }
 

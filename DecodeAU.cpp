@@ -28,7 +28,7 @@ int DecodeAU::decodeAUOpen()
     }
     pCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
     pCodecCtx->sample_rate= SAMPLE_RATE;
-    pCodecCtx->channel_layout=AV_CH_LAYOUT_STEREO;
+    pCodecCtx->channel_layout= AVCHLAYOUT;
     pCodecCtx->channels = av_get_channel_layout_nb_channels(pCodecCtx->channel_layout);
     pCodecCtx->bit_rate = 64000;
     if (avcodec_open2(pCodecCtx, pCodec,NULL) < 0)
@@ -65,7 +65,7 @@ int DecodeAU::decodeAUDo(void *ibuf,int ilen)
         ret = avcodec_decode_audio4(pCodecCtx,pFrame, &gotFrame,&pkt);
         if(ret < 0)
         {
-            qDebug()<<"Failed to decode!\n";
+            qDebug()<<"Failed to decode!0068\n";
             return -1;
         }
         if (gotFrame >0)
@@ -87,8 +87,8 @@ int DecodeAU::audioResampling(AVCodecContext * audio_dec_ctx, AVFrame * pAudioDe
     SwrContext * swr_ctx = NULL;
     int data_size = 0;
     int ret = 0;
-    int64_t src_ch_layout = AV_CH_LAYOUT_STEREO;
-    int64_t dst_ch_layout = AV_CH_LAYOUT_STEREO;
+    int64_t src_ch_layout = AVCHLAYOUT;
+    int64_t dst_ch_layout = AVCHLAYOUT;
     int dst_nb_channels = 0;
     int dst_linesize = 0;
     int src_nb_samples = 0;
@@ -111,11 +111,11 @@ int DecodeAU::audioResampling(AVCodecContext * audio_dec_ctx, AVFrame * pAudioDe
         audio_dec_ctx->channel_layout : av_get_default_channel_layout(audio_dec_ctx->channels);
     if (out_channels == 1)
     {
-        dst_ch_layout = AV_CH_LAYOUT_MONO;
+        dst_ch_layout = AVCHLAYOUT;
     }
     else if(out_channels == 2)
     {
-        dst_ch_layout = AV_CH_LAYOUT_STEREO;
+        dst_ch_layout = AVCHLAYOUT;
     }
     else
     {
