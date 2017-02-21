@@ -46,7 +46,7 @@ private:
     QImage imageR,imageT;
 
 signals:
-    getFrame();
+    void getFrame();
 
 public slots:
     void readingFrame();

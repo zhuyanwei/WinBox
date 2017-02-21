@@ -102,12 +102,12 @@ void Widget::on_B_CloseCam()
     qDebug()<<"B_CloseCam clicked";
     isStart = false;
     TC->stop();
-    TC->sleep(2);
+    sleep(2);
     TC->~ThreadCamera();
 //    free(TC);
 
     TM->stop();
-    TM->sleep(1);
+    sleep(1);
     TM->~ThreadMic();
 //    free(TM);
 

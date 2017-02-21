@@ -200,9 +200,9 @@ int RtpSend::packGet(void *outBuf, int bufSize,int *outSize)
 
 U32 RtpSend::getCurrentMillisec(void)
 {
-    struct timeb tb;
-    ftime(&tb);
-    return 1000 * tb.time + tb.millitm;
+//    struct timeb tb;
+//    ftime(&tb);
+//    return 1000 * tb.time + tb.millitm;
 }
 
 int RtpSend::isStartCode4(char *buf)

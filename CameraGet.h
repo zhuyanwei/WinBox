@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
-#include <opencv/highgui.h>
+#include <opencv2/highgui/highgui_c.h>
 #include <opencv/cv.h>
 
 namespace Ui {

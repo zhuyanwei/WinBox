@@ -35,21 +35,21 @@ int Convert::convertOpen(int inWidth, int inHeight, AVPixelFormat inPixfmt, int 
     this->swsCtx = sws_getContext(this->inWidth,this->inHeight, this->inAvfmt, this->outWidth,this->outHeight, this->outAvfmt, SWS_BILINEAR, NULL,NULL, NULL);
     if (!this->swsCtx)
     {
-        qDebug()<<"Create scale context failed";
+        qDebug("Create scale context failed");
         goto err0;
     }
     // alloc buffers
     this->srcFrame = av_frame_alloc();
     if (!this->srcFrame)
     {
-        qDebug()<<"allocate src_frame failed";
+        qDebug("allocate src_frame failed");
         goto err1;
     }
     this->srcBuffersize = avpicture_get_size(this->inAvfmt,this->inWidth, this->inHeight);
     this->srcBuffer = (uint8_t *) av_malloc(this->srcBuffersize);
     if (!this->srcBuffer)
     {
-        qDebug()<<"allocate src_buffer failed";
+        qDebug("allocate src_buffer failed");
         goto err2;
     }
     avpicture_fill((AVPicture *) this->srcFrame, this->srcBuffer,this->inAvfmt, this->inWidth, this->inHeight);
@@ -57,19 +57,19 @@ int Convert::convertOpen(int inWidth, int inHeight, AVPixelFormat inPixfmt, int 
     this->dstFrame = av_frame_alloc();
     if (!this->dstFrame)
     {
-        qDebug()<<"allocate dst_frame failed";
+        qDebug("allocate dst_frame failed");
         goto err3;
     }
     this->dstBuffersize = avpicture_get_size(this->outAvfmt,this->outWidth, this->outHeight);
     this->dstBuffer = (uint8_t *) av_malloc(this->dstBuffersize);
     if (!this->dstBuffer)
     {
-        qDebug()<<"allocate dst_buffer failed";
+        qDebug("allocate dst_buffer failed");
         goto err4;
     }
     avpicture_fill((AVPicture *) this->dstFrame, this->dstBuffer,this->outAvfmt, this->outWidth,this->outHeight);
 
-    qDebug()<<"+++ Convert Opened,all clear";
+    qDebug("+++ Convert Opened,all clear");
     return 0;
 
     err4: av_frame_free(&this->dstFrame);
@@ -88,7 +88,7 @@ void Convert::convertClose()
     av_frame_free(&this->srcFrame);
     sws_freeContext(this->swsCtx);
     free(this);
-    qDebug()<<"Convert Closed";
+    qDebug("Convert Closed");
 }
 
 int Convert::convertDo(void *inbuf, int isize,void **poutbuf, int *posize)

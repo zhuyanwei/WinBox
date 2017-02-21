@@ -50,7 +50,7 @@ private:
     double              average;
 
 signals:
-    getAudio();
+    void getAudio();
 
 public slots:
 };

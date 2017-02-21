@@ -2,12 +2,12 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include <unistd.h>
 #include <QImage>
 #include <QTime>
 #include <QString>
 #include <QDebug>
 #include <QMessageBox>
-#include <winsock2.h>
 #include <QHostInfo>
 #include <QUdpSocket>
 #include <QNetworkInterface>

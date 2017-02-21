@@ -25,7 +25,7 @@ private:
     bool isStop;
 
 signals:
-    captured();
+    void captured();
 
 protected:
     void run();

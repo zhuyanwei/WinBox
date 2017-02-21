@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QDebug>
 #include <opencv/cv.h>
-#include <opencv/highgui.h>
+#include <opencv2/highgui/highgui_c.h>
 #include <COMDEF.h>
 #include <FFMPEG_COMMON.h>
 

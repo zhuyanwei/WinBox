@@ -47,15 +47,13 @@ HEADERS  += widget.h \
 FORMS    += widget.ui \
     Show.ui
 
-INCLUDEPATH += D:\OpenCV\install\include \
-D:\ffmpeg322\include \
-D:\RTP\jrtpnothread\include \
-D:\PA\PAnoASIO\include
+INCLUDEPATH += /usr/include \
+/usr/local/JRtp/include
 
-LIBS += -LD:\OpenCV\install\bin -llibopencv_core231 -llibopencv_highgui231 \
--LD:\ffmpeg322\lib -llibavformat -llibavdevice -llibavcodec -llibavutil -llibswscale -llibswresample \
--LD:\RTP\jrtpnothread\lib -llibjrtplib_d \
--L/usr/D:\PA\PAnoASIO\lib -llibportaudio \#-LD:\Qt\Qt5.7.0\5.7\mingw53_32\lib -llibQt5Network \-lws2_32
+LIBS += -L/usr/local/FFMpeg/lib/ -lavformat -lavdevice -lavcodec -lavutil -lswscale -lswresample \
+-L/usr/local/JRtp/lib -ljrtp \
+-L/usr/lib/arm-linux-gnueabihf/ -lopencv_core -lopencv_highgui \
+-L/usr/lib/arm-linux-gnueabihf/ -lportaudio
 
 
 
