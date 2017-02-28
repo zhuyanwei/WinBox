@@ -18,8 +18,8 @@
     <rect>
      <x>61</x>
      <y>570</y>
-     <width>543</width>
-     <height>26</height>
+     <width>588</width>
+     <height>29</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -86,7 +86,7 @@
      <x>61</x>
      <y>500</y>
      <width>538</width>
-     <height>26</height>
+     <height>29</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -114,7 +114,7 @@
     <item>
      <widget class="QLineEdit" name="I_RemotePort">
       <property name="text">
-       <string>220</string>
+       <string>8090</string>
       </property>
      </widget>
     </item>
@@ -133,7 +133,7 @@
      <x>61</x>
      <y>440</y>
      <width>498</width>
-     <height>26</height>
+     <height>29</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -147,7 +147,7 @@
     <item>
      <widget class="QLineEdit" name="I_LocalPort">
       <property name="text">
-       <string>220</string>
+       <string>8090</string>
       </property>
      </widget>
     </item>

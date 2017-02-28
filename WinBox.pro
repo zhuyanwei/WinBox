@@ -24,7 +24,7 @@ SOURCES += main.cpp\
     MicGet.cpp \
     ThreadMic.cpp \
     EncodeAU.cpp \
-    DecodeAU.cpp \
+    DecodeAU.cpp  \
     Show.cpp
 
 HEADERS  += widget.h \
