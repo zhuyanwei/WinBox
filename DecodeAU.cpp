@@ -56,7 +56,7 @@ void DecodeAU::decodeAUClose()
 
 int DecodeAU::decodeAUDo(void *ibuf,int ilen)
 {
-    pcm = fopen("raw.pcm","a");
+   // pcm = fopen("raw.pcm","a");
     av_init_packet(&pkt);
     pkt.data = (uchar *)ibuf;
     pkt.size = ilen;
@@ -71,14 +71,14 @@ int DecodeAU::decodeAUDo(void *ibuf,int ilen)
         if (gotFrame >0)
         {
             audioResampling(pCodecCtx,pFrame,AVSAMPLEFMT,NUM_CHANNELS,SAMPLE_RATE,outBuf);
-            fwrite(outBuf,1,outSize,pcm);
+      //      fwrite(outBuf,1,outSize,pcm);
             av_audio_fifo_write(auoutFifo,(void**)&outBuf,FRAMES_PER_BUFFER);
         }
         pkt.size -= ret;
         pkt.data += ret;
     }
     av_free_packet(&pkt);
-    fclose(pcm);
+  //  fclose(pcm);
     return 0;
 }
 
