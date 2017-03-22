@@ -8,7 +8,8 @@ RtpSend::RtpSend()
 
 RtpSend::~RtpSend()
 {
-
+//    free(this);
+    qDebug("RtpSend destruct");
 }
 
 int RtpSend::netOpen(RTPSession *sess)
@@ -20,7 +21,7 @@ int RtpSend::netOpen(RTPSession *sess)
 
 void RtpSend::netClose()
 {
-    free(this);
+//    free(this);
     qDebug()<<"Network Closed";
 }
 

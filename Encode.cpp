@@ -7,7 +7,8 @@ Encode::Encode()
 
 Encode::~Encode()
 {
-
+//    free(this);
+    qDebug("Encode destruct");
 }
 
 int Encode::encodeOpen(int srcPicWidth,int srcPicHeight,int encPicWidth, int encPicHeight,int fps,int bitrate,int gop, int chromaInterleave)
@@ -104,7 +105,7 @@ void Encode::encodeClose()
     av_frame_free(&this->frame);
     avcodec_close(this->ctx);
     av_free(this->ctx);
-    free(this);
+//    free(this);
     qDebug()<<"Encode Closed";
 }
 

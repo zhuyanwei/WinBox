@@ -114,7 +114,7 @@
     <item>
      <widget class="QLineEdit" name="I_RemotePort">
       <property name="text">
-       <string>220</string>
+       <string>8090</string>
       </property>
      </widget>
     </item>
@@ -147,7 +147,7 @@
     <item>
      <widget class="QLineEdit" name="I_LocalPort">
       <property name="text">
-       <string>220</string>
+       <string>8090</string>
       </property>
      </widget>
     </item>

@@ -7,7 +7,8 @@ Convert::Convert()
 
 Convert::~Convert()
 {
-
+//    free(this);
+    qDebug("Convert destruct");
 }
 
 int Convert::convertOpen(int inWidth, int inHeight, AVPixelFormat inPixfmt, int outWidth, int outHeight, AVPixelFormat outPixfmt)
@@ -87,7 +88,7 @@ void Convert::convertClose()
     av_free(this->srcBuffer);
     av_frame_free(&this->srcFrame);
     sws_freeContext(this->swsCtx);
-    free(this);
+//    free(this);
     qDebug()<<"Convert Closed";
 }
 

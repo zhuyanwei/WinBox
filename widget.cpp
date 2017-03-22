@@ -46,22 +46,32 @@ Widget::~Widget()
     if(TC)
     {
         TC->stop();
-//        free(TC);
+        sleep(1);
+        delete TC;
+        TC = NULL;
     }
     if(sh)
     {
-        sh->close();
-//        free(sh);
+//        sh->close();
+        delete sh;
+        sh = NULL;
     }
     if(TM)
     {
         TM->stop();
-//        free(TM);
+        sleep(1);
+        delete TM;
+        TM = NULL;
     }
-//    ea->encodeAUClose();
-//    da->decodeAUClose();
-//    mg->closeAudio();
-
+    ea->encodeAUClose();
+    da->decodeAUClose();
+    mg->closeAudio();
+    delete ea;
+    delete da;
+    delete mg;
+    ea = NULL;
+    da = NULL;
+    mg = NULL;
     delete ui;
     qDebug()<<"+++ all finished";
 }
@@ -71,7 +81,7 @@ void Widget::showLocalPic()
     if(isStart == true)
     {
         imgLocal = QImage((const uchar*)TC->capFrame->imageData,TC->capFrame->width, TC->capFrame->height, QImage::Format_RGB888).rgbSwapped();
-        imgLocal = imgLocal.mirrored(true,false);
+//        imgLocal = imgLocal.mirrored(true,false);
         ui->L_LocalWindow->setPixmap(QPixmap::fromImage(imgLocal));
     }
     else
@@ -90,7 +100,7 @@ void Widget::on_B_OpenCam()
 
     TM = new ThreadMic(mg);
     TM->start();
-//    sleep(1);
+    sleep(1);
 
     sh = new Show(this,&session,&da);
     sh->show();
@@ -128,65 +138,80 @@ void Widget::on_B_Initial()
 {
     qDebug()<<"B_Initial clicked";
 
+    //***************************************************reading ini file way
+//    QSettings *configIniRead = new QSettings("Settings", QSettings::IniFormat);
+//    uint16_t localport = configIniRead->value("Local/port").toInt();
+//    uint32_t localSSRC = configIniRead->value("Local/SSRC").toInt();
+//    QString remoteIP = configIniRead->value("Remote/IP").toString();
+//    uint16_t remoteport = configIniRead->value("Remote/port").toInt();
+//    std::string ipss = remoteIP.toStdString();
+//    delete configIniRead;
+//    configIniRead = NULL;
+
+//    sessionPara.SetOwnTimestampUnit(1.0/90000.0);
+//    sessionPara.SetAcceptOwnPackets(true);
+//    sessionPara.SetUsePredefinedSSRC(true);
+////    uint32_t ssrc = ui->I_SSRC->text().toInt();
+//    uint32_t ssrc = localSSRC;
+//    sessionPara.SetPredefinedSSRC(ssrc);
+//    ssrcList[0] = ssrc;
+//    sessionPara.SetMaximumPacketSize(MAXDATASIZE);
+//    //set baseport
+////    uint16_t baseport = ui->I_LocalPort->text().toInt();
+//    uint16_t baseport = localport;
+//    transPara.SetPortbase(baseport);
+//    portList[0] = baseport;
+//    status = session.Create(sessionPara,&transPara);
+//    session.SetDefaultPayloadType(H264);
+//    session.SetDefaultMark(false);
+//    session.SetDefaultTimestampIncrement(90000.0 /FRAMERATE);
+//    //add des ip and port
+////    std::string ipStr = ui->I_RemoteIP->text().toStdString();
+//    std::string ipStr = ipss;
+//    uint32_t destIp = inet_addr(ipStr.c_str());
+//    destIp = ntohl(destIp);
+////    uint16_t desPort = ui->I_RemotePort->text().toInt();
+//    uint16_t desPort = remoteport;
+//    RTPIPv4Address addr(destIp,desPort);
+//    status = session.AddDestination(addr);
+
+    //****************************************************the original way
     sessionPara.SetOwnTimestampUnit(1.0/90000.0);
     sessionPara.SetAcceptOwnPackets(true);
     sessionPara.SetUsePredefinedSSRC(true);
     uint32_t ssrc = ui->I_SSRC->text().toInt();
-//    uint32_t ssrc = 10;
     sessionPara.SetPredefinedSSRC(ssrc);
     ssrcList[0] = ssrc;
     sessionPara.SetMaximumPacketSize(MAXDATASIZE);
-    //set baseport
     uint16_t baseport = ui->I_LocalPort->text().toInt();
-//    uint16_t baseport = 100;
     transPara.SetPortbase(baseport);
     portList[0] = baseport;
     status = session.Create(sessionPara,&transPara);
     session.SetDefaultPayloadType(H264);
     session.SetDefaultMark(false);
     session.SetDefaultTimestampIncrement(90000.0 /FRAMERATE);
-    //add des ip and port
-    std::string ipStr = ui->I_RemoteIP->text().toStdString();
-    uint32_t destIp = inet_addr(ipStr.c_str());
-    destIp = ntohl(destIp);
-    uint16_t desPort = ui->I_RemotePort->text().toInt();
-    RTPIPv4Address addr(destIp,desPort);
-    status = session.AddDestination(addr);
 
-//    std::string ipStr = "127.0.0.1";
-//    uint32_t destIp = inet_addr(ipStr.c_str());
-//    destIp = ntohl(destIp);
-//    uint16_t desPort = 100;
-//    RTPIPv4Address addr(destIp,desPort);
-//    status = session.AddDestination(addr);
+    udpSocket = new QUdpSocket(this);
+    port = 8080;
+    udpSocket->bind(port,QUdpSocket::ShareAddress|QUdpSocket::ReuseAddressHint);
 
-
-//    udpSocket = new QUdpSocket();
-//    port = 8080;
-//    udpSocket->bind(port,QUdpSocket::ShareAddress|QUdpSocket::ReuseAddressHint);
-//    QList<QHostAddress> list = QNetworkInterface::allAddresses();
-//    foreach (QHostAddress address, list)
-//    {
-//        if(address.protocol() == QAbstractSocket::IPv4Protocol && address.toString().contains("192.168."))
-//        {
-//            QByteArray ba = address.toString().toLatin1();
-//            ipList[0] = inet_addr(ba.data());
-//        }
-//    }
-//    status =session.SupportsMulticasting();
-//    m_ip = inet_addr("224.1.1.1");
-//    m_port = 8090;
-//    RTPIPv4Address m_addr(ntohl(m_ip), m_port);
-//    status = session.JoinMulticastGroup(m_addr);
-//    connect(udpSocket,SIGNAL(readyRead()),this,SLOT(proRequest()));
-
-//    udpS = new QUdpSocket();
-//    udpR = new QUdpSocket();
-//    portS = 2001;
-//    ipS = QHostAddress("127.0.0.1");
-//    portR = 2001;
-//    udpR->bind(QHostAddress::Any, portR);
-//    connect(udpR, SIGNAL(readyRead()),this, SLOT(slotTest()));
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+    foreach (QHostAddress address, list)
+    {
+        if(address.protocol() == QAbstractSocket::IPv4Protocol && address.toString().contains("127.0."))
+        {
+            QByteArray ba = address.toString().toLatin1();
+            ipList[0] = inet_addr(ba.data());
+        }
+    }
+    status = session.SupportsMulticasting();
+//    CheckError(status);
+    m_ip = inet_addr("224.1.1.1");
+    m_port = 8090;
+    RTPIPv4Address m_addr(ntohl(m_ip), m_port);
+    status = session.JoinMulticastGroup(m_addr);
+//    CheckError(status);
+    connect(udpSocket,SIGNAL(readyRead()),this,SLOT(proRequest()));
 }
 
 void Widget::on_B_Test()
@@ -323,7 +348,7 @@ void Widget::proRequest()
                         ipList[1] = srcip;
                         portList[1] = srcport;
                         ssrcList[1] = ssrc;
-//                        sleep(1);
+                        sleep(1);
                         sh = new Show(this,&session,&da);
                         sh->ssrc[0] = ssrc;
                         sh->show();

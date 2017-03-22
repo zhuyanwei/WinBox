@@ -1,0 +1,14 @@
+[Local]
+IP=192.168.0.1
+port=8080
+SSRC=11
+
+[Remote]
+IP=127.0.0.1
+port=8080
+SSRC=22
+
+[Third]
+IP=192.168.120.1
+port=8090
+SSRC=33

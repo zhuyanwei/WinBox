@@ -8,7 +8,7 @@ EncodeAU::EncodeAU()
 }
 EncodeAU::~EncodeAU()
 {
-
+    printf("EncodeAU destruct\n");
 }
 
 int EncodeAU::encodeAUOpen()

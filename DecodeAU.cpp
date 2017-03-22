@@ -8,7 +8,7 @@ DecodeAU::DecodeAU()
 }
 DecodeAU::~DecodeAU()
 {
-
+    printf("DecodeAU destruct\n");
 }
 
 int DecodeAU::decodeAUOpen()

@@ -5,12 +5,14 @@
 #include <QImage>
 #include <QTime>
 #include <QString>
+#include <QSettings>
 #include <QDebug>
 #include <QMessageBox>
 #include <winsock2.h>
 #include <QHostInfo>
 #include <QUdpSocket>
 #include <QNetworkInterface>
+#include <unistd.h>
 #include "ThreadCamera.h"
 #include "ThreadMic.h"
 #include "EncodeAU.h"
