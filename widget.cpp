@@ -195,19 +195,34 @@ void Widget::on_B_Initial()
     port = 8080;
     udpSocket->bind(port,QUdpSocket::ShareAddress|QUdpSocket::ReuseAddressHint);
 
-    QList<QHostAddress> list = QNetworkInterface::allAddresses();
-    foreach (QHostAddress address, list)
+    //get local PC's name and ip
+    QString localName = QHostInfo::localHostName();
+//    qDebug()<<"localHostName:  "<<localName;
+    QHostInfo localInfo = QHostInfo::fromName(localName);
+    qDebug() <<"Local IP Address: "<<localInfo.addresses();
+    foreach(QHostAddress address,localInfo.addresses())
     {
-        if(address.protocol() == QAbstractSocket::IPv4Protocol && address.toString().contains("127.0."))
+        if(address.protocol() == QAbstractSocket::IPv4Protocol)
         {
             QByteArray ba = address.toString().toLatin1();
             ipList[0] = inet_addr(ba.data());
+            qDebug()<<"iplist0--"<<ba;
         }
     }
+
+//    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+//    foreach (QHostAddress address, list)
+//    {
+//        if(address.protocol() == QAbstractSocket::IPv4Protocol && address.toString().contains("127.0."))
+//        {
+//            QByteArray ba = address.toString().toLatin1();
+//            ipList[0] = inet_addr(ba.data());
+//        }
+//    }
     status = session.SupportsMulticasting();
 //    CheckError(status);
-    m_ip = inet_addr("224.1.1.1");
-    m_port = 8090;
+    m_ip = inet_addr("111.1.1.1");
+    m_port = 8010;
     RTPIPv4Address m_addr(ntohl(m_ip), m_port);
     status = session.JoinMulticastGroup(m_addr);
 //    CheckError(status);
@@ -382,7 +397,8 @@ void Widget::proRequest()
                 int btn = QMessageBox::information(this,"Request",tr("Request from%1").arg(name),QMessageBox::Yes,QMessageBox::No);
                 if (btn == QMessageBox::Yes)
                 {
-                    addDest(m_ip,m_port);
+//                    addDest(m_ip,m_port);
+                    addDest(srcip,srcport);
                     ipList[1] = srcip;
                     portList[1] = srcport;
                     ssrcList[1] = ssrc;
@@ -467,6 +483,7 @@ void Widget::on_B_Connect()
     QByteArray ba = ui->I_RemoteIP->text().toLatin1();
     char* destip=ba.data();
     sendMessage(Request,destip);
+    qDebug()<<"ttt--"<<ba<<destip;
 }
 void Widget::on_B_Invite()
 {
