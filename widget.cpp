@@ -187,12 +187,14 @@ void Widget::on_B_Initial()
     transPara.SetPortbase(baseport);
     portList[0] = baseport;
     status = session.Create(sessionPara,&transPara);
+    checkError(status);
+    qDebug()<<"after creat";
     session.SetDefaultPayloadType(H264);
     session.SetDefaultMark(false);
     session.SetDefaultTimestampIncrement(90000.0 /FRAMERATE);
 
     udpSocket = new QUdpSocket(this);
-    port = 8080;
+    port = 8010;
     udpSocket->bind(port,QUdpSocket::ShareAddress|QUdpSocket::ReuseAddressHint);
 
     //get local PC's name and ip
@@ -209,23 +211,11 @@ void Widget::on_B_Initial()
             qDebug()<<"iplist0--"<<ba;
         }
     }
-
-//    QList<QHostAddress> list = QNetworkInterface::allAddresses();
-//    foreach (QHostAddress address, list)
-//    {
-//        if(address.protocol() == QAbstractSocket::IPv4Protocol && address.toString().contains("127.0."))
-//        {
-//            QByteArray ba = address.toString().toLatin1();
-//            ipList[0] = inet_addr(ba.data());
-//        }
-//    }
     status = session.SupportsMulticasting();
-//    CheckError(status);
     m_ip = inet_addr("111.1.1.1");
-    m_port = 8010;
+    m_port = 8000;
     RTPIPv4Address m_addr(ntohl(m_ip), m_port);
     status = session.JoinMulticastGroup(m_addr);
-//    CheckError(status);
     connect(udpSocket,SIGNAL(readyRead()),this,SLOT(proRequest()));
 }
 
@@ -267,6 +257,7 @@ void Widget::addDest(uint32_t dest_ip,uint16_t dest_port)
     RTPIPv4Address addr(dest_ip,dest_port);
     status = session.AddDestination(addr);
     checkError(status);
+    qDebug()<<"after DDDEST";
 }
 
 void Widget::sendMessage(MessageType type,char* destip)
@@ -278,38 +269,42 @@ void Widget::sendMessage(MessageType type,char* destip)
     {
         case Request:
         {
+            //local name
             QString name = QHostInfo::localHostName();
+            //local ip
             out<<name<<ipList[0]<<portList[0]<<ssrcList[0];
-            port = 8080;
+            //local udp port
+            port = 8010;
             break;
         }
         case Callback:
         {
+            //local ip
             out<<isStart2<<ipList[0]<<portList[0]<<ssrcList[0];
-            port = 8080;
+            port = 8010;
             break;
         }
         case Callback2:
         {
-            port = 8080;
+            port = 8010;
             break;
         }
         case Invite:
         {
             out<<ipList[0]<<portList[0]<<ssrcList[0]<<ipList[1]<<portList[1]<<ssrcList[1];
-            port = 8080;
+            port = 8010;
             break;
         }
         case CutIn:
         {
             out<<QCIp<<QCPort;
-            port = 8080;
+            port = 8010;
             break;
         }
         case CutInCB:
         {
             out<<ssrcList[0]<<ssrcList[1]<<ssrcList[2];
-            port = 8060;
+            port = 8010;
             break;
         }
     }
@@ -344,16 +339,17 @@ void Widget::proRequest()
         {
             case Callback:
             {
-                int YesorNo;
+                bool YesorNo;
                 uint16_t srcport;
                 uint32_t srcip;
                 uint32_t ssrc;
                 in>>YesorNo>>srcip>>srcport>>ssrc;
-                if (YesorNo == 1)
+                if (YesorNo == true)
                 {
                     if (isStart == 0)
                     {
-                        addDest(m_ip,m_port);
+//                        addDest(m_ip,m_port);
+                        addDest(srcip,srcport);
                         TC = new ThreadCamera(&session);
                         connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()),Qt::BlockingQueuedConnection);
                         isStart = 1;
@@ -371,17 +367,17 @@ void Widget::proRequest()
                     }
                     else
                     {
-                        ipList[2] =srcip;
-                        portList[2] = srcport;
-                        ssrcList[2] = ssrc;
-                        sh->ssrc[1] = ssrc;
+//                        ipList[2] =srcip;
+//                        portList[2] = srcport;
+//                        ssrcList[2] = ssrc;
+//                        sh->ssrc[1] = ssrc;
                     }
-                    struct in_addr tempip;
-                    tempip.s_addr = srcip;
-                    char *temp_ip = inet_ntoa(tempip);
-                    sendMessage(Callback2,temp_ip);
+//                    struct in_addr tempip;
+//                    tempip.s_addr = srcip;
+//                    char *temp_ip = inet_ntoa(tempip);
+//                    sendMessage(Callback2,temp_ip);
                 }
-                else if (YesorNo == 0)
+                else if (YesorNo == false)
                 {
                     QMessageBox::information(this,"Refused","Refused!!");
                 }
@@ -399,17 +395,26 @@ void Widget::proRequest()
                 {
 //                    addDest(m_ip,m_port);
                     addDest(srcip,srcport);
+                    qDebug()<<"request goto adddest";
+
+                    TC = new ThreadCamera(&session);
+                    connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()),Qt::BlockingQueuedConnection);
+                    isStart = 1;
+                    TC->start();
+                    TM = new ThreadMic(mg);
+                    TM->start();
+
                     ipList[1] = srcip;
                     portList[1] = srcport;
                     ssrcList[1] = ssrc;
                     sh = new Show(this,&session,&da);
                     sh->ssrc[0] = ssrc;
                     sh->show();
-                    isStart2 =1;
+                    isStart2 = true;
                 }
                 else if (btn == QMessageBox::No)
                 {
-                    isStart2 = 0;
+                    isStart2 = false;
                 }
                 struct in_addr tempip;
                 tempip.s_addr = srcip;
