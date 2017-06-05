@@ -23,7 +23,7 @@ namespace Ui {
 class Widget;
 }
 
-enum MessageType{Request,Callback,Callback2,Invite,CutIn,CutInCB};
+enum MessageType{Request,Callback,Callback2,Invite,CutIn,CutInCB,End,CallbackEnd};
 
 class Widget : public QWidget
 {
@@ -51,6 +51,8 @@ private:
     bool checkError(int rtpErr);
     void addDest(uint32_t dest_ip,uint16_t dest_port);
     void sendMessage(MessageType type,char* destip);
+    void end();
+    void begin();
 
     Ui::Widget *ui;
     ThreadCamera *TC;

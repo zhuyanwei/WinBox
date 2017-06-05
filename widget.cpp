@@ -92,19 +92,7 @@ void Widget::showLocalPic()
 
 void Widget::on_B_OpenCam()
 {
-    qDebug()<<"B_OpenCam clicked";
-    TC = new ThreadCamera(&session);
-    connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()));
-    isStart = true;
-    TC->start();
-
-    TM = new ThreadMic(mg);
-    TM->start();
-    sleep(1);
-
-    sh = new Show(this,&session,&da);
-    sh->show();
-    isStart2 = true;
+    begin();
 }
 
 void Widget::on_B_CloseCam()
@@ -211,19 +199,22 @@ void Widget::on_B_Initial()
             qDebug()<<"iplist0--"<<ba;
         }
     }
-    status = session.SupportsMulticasting();
-    m_ip = inet_addr("111.1.1.1");
-    m_port = 8000;
-    RTPIPv4Address m_addr(ntohl(m_ip), m_port);
-    status = session.JoinMulticastGroup(m_addr);
+//    //multi play part
+//    status = session.SupportsMulticasting();
+//    m_ip = inet_addr("111.1.1.1");
+//    m_port = 8000;
+//    RTPIPv4Address m_addr(ntohl(m_ip), m_port);
+//    status = session.JoinMulticastGroup(m_addr);
     connect(udpSocket,SIGNAL(readyRead()),this,SLOT(proRequest()));
 }
 
 void Widget::on_B_Test()
 {
-//    qDebug()<<"B_Test clicked";
-//    QByteArray datagram = QString("153").toUtf8();
-//    udpS->writeDatagram(datagram, datagram.size(), ipS, portS);
+    end();
+    //send message to remote
+    QByteArray ba = ui->I_RemoteIP->text().toLatin1();
+    char* destip=ba.data();
+    sendMessage(End,destip);
 }
 
 int Widget::slotTest()
@@ -284,6 +275,11 @@ void Widget::sendMessage(MessageType type,char* destip)
             port = 8010;
             break;
         }
+        case End:
+        {
+            port = 8010;
+            break;
+        }
         case Callback2:
         {
             port = 8010;
@@ -337,6 +333,46 @@ void Widget::proRequest()
         in>>messageType;
         switch(messageType)
         {
+            case Request:
+            {
+                QString name;
+                uint16_t srcport;
+                uint32_t srcip;
+                uint32_t ssrc;
+                in>>name>>srcip>>srcport>>ssrc;
+                int btn = QMessageBox::information(this,"New Request",tr("Request from %1").arg(name),QMessageBox::Yes,QMessageBox::No);
+                if (btn == QMessageBox::Yes)
+                {
+    //                    addDest(m_ip,m_port);
+                    addDest(srcip,srcport);
+                    qDebug()<<"request goto adddest";
+
+                    TC = new ThreadCamera(&session);
+                    connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()),Qt::BlockingQueuedConnection);
+                    isStart = 1;
+                    TC->start();
+                    TM = new ThreadMic(mg);
+                    TM->start();
+
+                    ipList[1] = srcip;
+                    portList[1] = srcport;
+                    ssrcList[1] = ssrc;
+                    sh = new Show(this,&session,&da);
+                    sh->ssrc[0] = ssrc;
+                    sh->show();
+                    isStart2 = true;
+                }
+                else if (btn == QMessageBox::No)
+                {
+                    isStart2 = false;
+                }
+                struct in_addr tempip;
+                tempip.s_addr = srcip;
+                char *temp_ip= inet_ntoa(tempip);
+                sendMessage(Callback,temp_ip);
+                break;
+            }
+
             case Callback:
             {
                 bool YesorNo;
@@ -379,49 +415,17 @@ void Widget::proRequest()
                 }
                 else if (YesorNo == false)
                 {
-                    QMessageBox::information(this,"Refused","Refused!!");
+                    QMessageBox::information(this,"Refuse","Request Refused!!");
                 }
                 break;
             }
-            case Request:
+
+            case End:
             {
-                QString name;
-                uint16_t srcport;
-                uint32_t srcip;
-                uint32_t ssrc;
-                in>>name>>srcip>>srcport>>ssrc;
-                int btn = QMessageBox::information(this,"Request",tr("Request from%1").arg(name),QMessageBox::Yes,QMessageBox::No);
-                if (btn == QMessageBox::Yes)
-                {
-//                    addDest(m_ip,m_port);
-                    addDest(srcip,srcport);
-                    qDebug()<<"request goto adddest";
-
-                    TC = new ThreadCamera(&session);
-                    connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()),Qt::BlockingQueuedConnection);
-                    isStart = 1;
-                    TC->start();
-                    TM = new ThreadMic(mg);
-                    TM->start();
-
-                    ipList[1] = srcip;
-                    portList[1] = srcport;
-                    ssrcList[1] = ssrc;
-                    sh = new Show(this,&session,&da);
-                    sh->ssrc[0] = ssrc;
-                    sh->show();
-                    isStart2 = true;
-                }
-                else if (btn == QMessageBox::No)
-                {
-                    isStart2 = false;
-                }
-                struct in_addr tempip;
-                tempip.s_addr = srcip;
-                char *temp_ip= inet_ntoa(tempip);
-                sendMessage(Callback,temp_ip);
+                end();
                 break;
             }
+
             case Callback2:
             {
                 if (isStart == 0)
@@ -435,6 +439,7 @@ void Widget::proRequest()
                 }
                 break;
             }
+
             case Invite:
             {
                 in>>ipList[1]>>portList[1]>>ssrcList[1]>>ipList[2]>>portList[2]>>ssrcList[2];
@@ -507,4 +512,49 @@ void Widget::on_B_Add()
     dest_ip = ntohl(dest_ip);
     RTPIPv4Address addr(dest_ip,dest_port);
     status = session.AddDestination(addr);
+}
+
+void Widget::end()
+{
+    //finish local task
+    isStart = false;
+    if(TC)
+    {
+        TC->stop();
+        sleep(1);
+        delete TC;
+        TC = NULL;
+    }
+    if(TM)
+    {
+        TM->stop();
+        sleep(1);
+        delete TM;
+        TM = NULL;
+    }
+    isStart2 = false;
+    if(sh)
+    {
+        sh->close();
+        delete sh;
+        sh = NULL;
+    }
+
+    ui->L_LocalWindow->setText("LocalWindow");
+}
+
+void Widget::begin()
+{
+    TC = new ThreadCamera(&session);
+    connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()));
+    isStart = true;
+    TC->start();
+
+    TM = new ThreadMic(mg);
+    TM->start();
+    sleep(1);
+
+    sh = new Show(this,&session,&da);
+    sh->show();
+    isStart2 = true;
 }
