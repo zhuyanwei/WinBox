@@ -189,14 +189,14 @@ void Widget::on_B_Initial()
     QString localName = QHostInfo::localHostName();
 //    qDebug()<<"localHostName:  "<<localName;
     QHostInfo localInfo = QHostInfo::fromName(localName);
-    qDebug() <<"Local IP Address: "<<localInfo.addresses();
+//    qDebug() <<"Local IP Address: "<<localInfo.addresses();
     foreach(QHostAddress address,localInfo.addresses())
     {
         if(address.protocol() == QAbstractSocket::IPv4Protocol)
         {
             QByteArray ba = address.toString().toLatin1();
             ipList[0] = inet_addr(ba.data());
-            qDebug()<<"iplist0--"<<ba;
+            qDebug()<<"Local ip--"<<ba;
         }
     }
 //    //multi play part
@@ -212,9 +212,9 @@ void Widget::on_B_Test()
 {
     end();
     //send message to remote
-    QByteArray ba = ui->I_RemoteIP->text().toLatin1();
-    char* destip=ba.data();
-    sendMessage(End,destip);
+//    QByteArray ba = ui->I_RemoteIP->text().toLatin1();
+//    char* destip=ba.data();
+//    sendMessage(End,destip);
 }
 
 int Widget::slotTest()
@@ -346,21 +346,13 @@ void Widget::proRequest()
     //                    addDest(m_ip,m_port);
                     addDest(srcip,srcport);
                     qDebug()<<"request goto adddest";
+                    //the server self starts
+                    begin();
 
-                    TC = new ThreadCamera(&session);
-                    connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()),Qt::BlockingQueuedConnection);
-                    isStart = 1;
-                    TC->start();
-                    TM = new ThreadMic(mg);
-                    TM->start();
-
+                    sh->ssrc[0] = ssrc;
                     ipList[1] = srcip;
                     portList[1] = srcport;
                     ssrcList[1] = ssrc;
-                    sh = new Show(this,&session,&da);
-                    sh->ssrc[0] = ssrc;
-                    sh->show();
-                    isStart2 = true;
                 }
                 else if (btn == QMessageBox::No)
                 {
@@ -382,36 +374,18 @@ void Widget::proRequest()
                 in>>YesorNo>>srcip>>srcport>>ssrc;
                 if (YesorNo == true)
                 {
-                    if (isStart == 0)
+                    if (isStart == false)
                     {
 //                        addDest(m_ip,m_port);
                         addDest(srcip,srcport);
-                        TC = new ThreadCamera(&session);
-                        connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()),Qt::BlockingQueuedConnection);
-                        isStart = 1;
-                        TC->start();
-                        TM = new ThreadMic(mg);
-                        TM->start();
+                        //the client self starts
+                        begin();
+
+                        sh->ssrc[0] = ssrc;
                         ipList[1] = srcip;
                         portList[1] = srcport;
                         ssrcList[1] = ssrc;
-                        sleep(1);
-                        sh = new Show(this,&session,&da);
-                        sh->ssrc[0] = ssrc;
-                        sh->show();
-                        isStart2 =1;
                     }
-                    else
-                    {
-//                        ipList[2] =srcip;
-//                        portList[2] = srcport;
-//                        ssrcList[2] = ssrc;
-//                        sh->ssrc[1] = ssrc;
-                    }
-//                    struct in_addr tempip;
-//                    tempip.s_addr = srcip;
-//                    char *temp_ip = inet_ntoa(tempip);
-//                    sendMessage(Callback2,temp_ip);
                 }
                 else if (YesorNo == false)
                 {
@@ -493,7 +467,7 @@ void Widget::on_B_Connect()
     QByteArray ba = ui->I_RemoteIP->text().toLatin1();
     char* destip=ba.data();
     sendMessage(Request,destip);
-    qDebug()<<"ttt--"<<ba<<destip;
+    qDebug()<<"send connect to--"<<ba<<destip;
 }
 void Widget::on_B_Invite()
 {
@@ -521,9 +495,17 @@ void Widget::end()
     if(TC)
     {
         TC->stop();
-        sleep(1);
+        while(TC->isRunning())
+        {
+        }
         delete TC;
         TC = NULL;
+    }
+    if(sh)
+    {
+//        sh->close();
+        delete sh;
+        sh = NULL;
     }
     if(TM)
     {
@@ -533,14 +515,9 @@ void Widget::end()
         TM = NULL;
     }
     isStart2 = false;
-    if(sh)
-    {
-        sh->close();
-        delete sh;
-        sh = NULL;
-    }
 
     ui->L_LocalWindow->setText("LocalWindow");
+    qDebug()<<"one time view ends";
 }
 
 void Widget::begin()
