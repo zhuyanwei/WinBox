@@ -43,26 +43,7 @@ Widget::~Widget()
 #ifdef WIN32
     WSACleanup();
 #endif
-    if(TC)
-    {
-        TC->stop();
-        sleep(1);
-        delete TC;
-        TC = NULL;
-    }
-    if(sh)
-    {
-//        sh->close();
-        delete sh;
-        sh = NULL;
-    }
-    if(TM)
-    {
-        TM->stop();
-        sleep(1);
-        delete TM;
-        TM = NULL;
-    }
+    end();
     ea->encodeAUClose();
     da->decodeAUClose();
     mg->closeAudio();
@@ -102,16 +83,13 @@ void Widget::on_B_CloseCam()
     TC->stop();
     TC->sleep(2);
     TC->~ThreadCamera();
-//    free(TC);
 
     TM->stop();
     TM->sleep(1);
     TM->~ThreadMic();
-//    free(TM);
 
     isStart2 = false;
     sh->close();
-//    free(sh);
 
     ui->L_LocalWindow->setText("LocalWindow");
 }
@@ -210,11 +188,12 @@ void Widget::on_B_Initial()
 
 void Widget::on_B_Test()
 {
+    //finish local tasks
     end();
     //send message to remote
-//    QByteArray ba = ui->I_RemoteIP->text().toLatin1();
-//    char* destip=ba.data();
-//    sendMessage(End,destip);
+    QByteArray ba = ui->I_RemoteIP->text().toLatin1();
+    char* destip=ba.data();
+    sendMessage(End,destip);
 }
 
 int Widget::slotTest()
@@ -271,6 +250,7 @@ void Widget::sendMessage(MessageType type,char* destip)
         case Callback:
         {
             //local ip
+            //the answer of yes or no
             out<<isStart2<<ipList[0]<<portList[0]<<ssrcList[0];
             port = 8010;
             break;
@@ -467,7 +447,7 @@ void Widget::on_B_Connect()
     QByteArray ba = ui->I_RemoteIP->text().toLatin1();
     char* destip=ba.data();
     sendMessage(Request,destip);
-    qDebug()<<"send connect to--"<<ba<<destip;
+    qDebug()<<"send connect to--"<<ba;
 }
 void Widget::on_B_Invite()
 {
@@ -490,7 +470,6 @@ void Widget::on_B_Add()
 
 void Widget::end()
 {
-    //finish local task
     isStart = false;
     if(TC)
     {
