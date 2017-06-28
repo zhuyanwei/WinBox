@@ -73,25 +73,20 @@ void Widget::showLocalPic()
 
 void Widget::on_B_OpenCam()
 {
+    //add remote ip and port
+    std::string ipStr = ui->I_RemoteIP->text().toStdString();
+    uint32_t destIp = inet_addr(ipStr.c_str());
+    destIp = ntohl(destIp);
+    uint16_t desPort = ui->I_RemotePort->text().toInt();
+
+    addDest(destIp,desPort);
+
     begin();
 }
 
 void Widget::on_B_CloseCam()
 {
-    qDebug()<<"B_CloseCam clicked";
-    isStart = false;
-    TC->stop();
-    TC->sleep(2);
-    TC->~ThreadCamera();
-
-    TM->stop();
-    TM->sleep(1);
-    TM->~ThreadMic();
-
-    isStart2 = false;
-    sh->close();
-
-    ui->L_LocalWindow->setText("LocalWindow");
+    end();
 }
 
 void Widget::on_B_Pause()
@@ -165,9 +160,7 @@ void Widget::on_B_Initial()
 
     //get local PC's name and ip
     QString localName = QHostInfo::localHostName();
-//    qDebug()<<"localHostName:  "<<localName;
     QHostInfo localInfo = QHostInfo::fromName(localName);
-//    qDebug() <<"Local IP Address: "<<localInfo.addresses();
     foreach(QHostAddress address,localInfo.addresses())
     {
         if(address.protocol() == QAbstractSocket::IPv4Protocol)
@@ -374,7 +367,7 @@ void Widget::proRequest()
                 }
                 else if (YesorNo == false)
                 {
-                    QMessageBox::information(this,"Refuse","Request refused!");
+                    QMessageBox::information(this,"Refuse","Request refused !");
                 }
                 break;
             }
