@@ -191,8 +191,13 @@ void Widget::on_B_Test()
     //finish local tasks
     end();
     //send message to remote
-    QByteArray ba = ui->I_RemoteIP->text().toLatin1();
-    char* destip=ba.data();
+    //get working partnal's ip
+    struct in_addr a1;
+//    uint32_t b1 = ipList[1];
+//    memcpy(&a1,&b1,4);
+    a1.S_un.S_addr = ipList[1];
+    char* destip = inet_ntoa(a1);
+    qDebug()<<"Remote ip--"<<destip;
     sendMessage(End,destip);
 }
 
@@ -320,7 +325,7 @@ void Widget::proRequest()
                 uint32_t srcip;
                 uint32_t ssrc;
                 in>>name>>srcip>>srcport>>ssrc;
-                int btn = QMessageBox::information(this,"New Request",tr("Request from %1").arg(name),QMessageBox::Yes,QMessageBox::No);
+                int btn = QMessageBox::information(this,"New request",tr("Request from %1").arg(name),QMessageBox::Yes,QMessageBox::No);
                 if (btn == QMessageBox::Yes)
                 {
     //                    addDest(m_ip,m_port);
@@ -369,7 +374,7 @@ void Widget::proRequest()
                 }
                 else if (YesorNo == false)
                 {
-                    QMessageBox::information(this,"Refuse","Request Refused!!");
+                    QMessageBox::information(this,"Refuse","Request refused!");
                 }
                 break;
             }
