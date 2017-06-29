@@ -4,6 +4,7 @@ ThreadMic::ThreadMic(MicGet *au)
 {
     mg = au;
     isStop = false;
+    mg->isStop = false;
 }
 
 ThreadMic::~ThreadMic()

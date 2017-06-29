@@ -79,6 +79,7 @@ int MicGet::recordAudio()
         fflush(stdout);
     }
     err = Pa_OpenStream(&stream,&inputPara, &outputPara,SAMPLE_RATE,FRAMES_PER_BUFFER,paClipOff, audioCallback,&data );
+    qDebug("Error message: %s\n", Pa_GetErrorText( err ));
     qDebug("record mic out\n");
     return 1;
 //    if( err < 0 ) goto done;

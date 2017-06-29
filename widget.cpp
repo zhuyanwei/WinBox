@@ -26,7 +26,6 @@ Widget::Widget(QWidget *parent) :
     connect(ui->B_Connect,SIGNAL(clicked()),this,SLOT(on_B_Connect()));
     connect(ui->B_Invite,SIGNAL(clicked()),this,SLOT(on_B_Invite()));
     connect(ui->B_Add,SIGNAL(clicked()),this,SLOT(on_B_Add()));
-
     connect(ui->B_Pause,SIGNAL(clicked()),this,SLOT(on_B_Pause()));
     connect(ui->B_Test,SIGNAL(clicked()),this,SLOT(on_B_Test()));
 
@@ -76,7 +75,6 @@ void Widget::on_B_OpenCam()
     //add remote ip and port
     std::string ipStr = ui->I_RemoteIP->text().toStdString();
     uint32_t destIp = inet_addr(ipStr.c_str());
-    destIp = ntohl(destIp);
     uint16_t desPort = ui->I_RemotePort->text().toInt();
 
     addDest(destIp,desPort);
@@ -91,8 +89,17 @@ void Widget::on_B_CloseCam()
 
 void Widget::on_B_Pause()
 {
-    qDebug()<<"B_Pause clicked";
-    TC->stop();
+    //finish local tasks
+    end();
+    //send message to remote
+    //get working partnal's ip
+    struct in_addr a1;
+//    uint32_t b1 = ipList[1];
+//    memcpy(&a1,&b1,4);
+    a1.S_un.S_addr = ipList[1];
+    char* destip = inet_ntoa(a1);
+    qDebug()<<"Remote ip--"<<destip;
+    sendMessage(End,destip);
 }
 
 void Widget::on_B_Initial()
@@ -181,17 +188,6 @@ void Widget::on_B_Initial()
 
 void Widget::on_B_Test()
 {
-    //finish local tasks
-    end();
-    //send message to remote
-    //get working partnal's ip
-    struct in_addr a1;
-//    uint32_t b1 = ipList[1];
-//    memcpy(&a1,&b1,4);
-    a1.S_un.S_addr = ipList[1];
-    char* destip = inet_ntoa(a1);
-    qDebug()<<"Remote ip--"<<destip;
-    sendMessage(End,destip);
 }
 
 int Widget::slotTest()
@@ -469,6 +465,7 @@ void Widget::on_B_Add()
 void Widget::end()
 {
     isStart = false;
+    //delete all threads
     if(TC)
     {
         TC->stop();
@@ -492,6 +489,8 @@ void Widget::end()
         TM = NULL;
     }
     isStart2 = false;
+    //clear rtp
+    session.ClearDestinations();
 
     ui->L_LocalWindow->setText("LocalWindow");
     qDebug()<<"one time view ends";
