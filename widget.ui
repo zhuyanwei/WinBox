@@ -6,67 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>658</width>
-    <height>639</height>
+    <width>600</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Widget</string>
   </property>
-  <widget class="QWidget" name="horizontalLayoutWidget_3">
-   <property name="geometry">
-    <rect>
-     <x>61</x>
-     <y>570</y>
-     <width>543</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_3">
-    <item>
-     <widget class="QPushButton" name="B_CloseCam">
-      <property name="text">
-       <string>CloseCamera</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="B_OpenCam">
-      <property name="text">
-       <string>OpenCamera</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="B_Test">
-      <property name="text">
-       <string>Test</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="B_Pause">
-      <property name="text">
-       <string>Pause</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="B_Invite">
-      <property name="text">
-       <string>Invite</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="B_Add">
-      <property name="text">
-       <string>Add</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QLabel" name="L_LocalWindow">
    <property name="geometry">
     <rect>
@@ -76,103 +22,283 @@
      <height>240</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 0, 0);</string>
+   </property>
    <property name="text">
-    <string>LocalWindow</string>
+    <string/>
    </property>
   </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_2">
+  <widget class="QWidget" name="Wig_Working" native="true">
    <property name="geometry">
     <rect>
-     <x>61</x>
-     <y>500</y>
-     <width>538</width>
-     <height>26</height>
+     <x>600</x>
+     <y>450</y>
+     <width>600</width>
+     <height>150</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>RemoteIP</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="I_RemoteIP">
-      <property name="text">
-       <string>127.0.0.1</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>RemotePort</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="I_RemotePort">
-      <property name="text">
-       <string>8090</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="B_Connect">
-      <property name="text">
-       <string>Connect</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>601</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="Lay_Remote" stretch="0,0,0,0,0">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <property name="leftMargin">
+        <number>50</number>
+       </property>
+       <property name="rightMargin">
+        <number>50</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>RemoteIP</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="I_RemoteIP">
+         <property name="text">
+          <string>127.0.0.1</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>RemotePort</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="I_RemotePort">
+         <property name="text">
+          <string>8090</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="Lay_Working">
+       <property name="leftMargin">
+        <number>150</number>
+       </property>
+       <property name="rightMargin">
+        <number>150</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="B_Connect">
+         <property name="text">
+          <string>Connect</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="B_Finish">
+         <property name="text">
+          <string>Finish</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
   </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget">
+  <widget class="QWidget" name="Wig_Initial" native="true">
    <property name="geometry">
     <rect>
-     <x>61</x>
-     <y>440</y>
-     <width>498</width>
-     <height>26</height>
+     <x>0</x>
+     <y>550</y>
+     <width>600</width>
+     <height>50</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>LocalPort</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="I_LocalPort">
-      <property name="text">
-       <string>8090</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>SSRC</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="I_SSRC">
-      <property name="text">
-       <string>22</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="B_Initial">
-      <property name="text">
-       <string>Initial</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>601</width>
+      <height>40</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="Lay_Initial" stretch="0,0,0,0,0,0">
+     <property name="spacing">
+      <number>10</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <property name="leftMargin">
+      <number>50</number>
+     </property>
+     <property name="rightMargin">
+      <number>50</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>LocalPort</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="I_LocalPort">
+       <property name="text">
+        <string>8090</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>138</width>
+         <height>38</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>SSRC</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="I_SSRC">
+       <property name="text">
+        <string>22</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="B_Initial">
+       <property name="text">
+        <string>Initial</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="Wig_Debug" native="true">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>600</y>
+     <width>600</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <widget class="QWidget" name="horizontalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>601</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="B_CloseCam">
+       <property name="text">
+        <string>CloseCamera</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="B_OpenCam">
+       <property name="text">
+        <string>OpenCamera</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="B_Test">
+       <property name="text">
+        <string>Test</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="B_Invite">
+       <property name="text">
+        <string>Invite</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="B_Add">
+       <property name="text">
+        <string>Add</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="F_Welcome">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>600</width>
+     <height>500</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border-image: url(:/new/prefix1/pics/welcome.png);</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

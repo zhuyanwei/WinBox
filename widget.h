@@ -36,7 +36,7 @@ public:
 private slots:
     void on_B_OpenCam();
     void on_B_CloseCam();
-    void on_B_Pause();
+    void on_B_Finish();
     void on_B_Initial();
     void on_B_Connect();
     void on_B_Invite();

@@ -47,6 +47,10 @@ HEADERS  += widget.h \
 FORMS    += widget.ui \
     Show.ui
 
+RESOURCES += \
+    qtre.qrc
+
+
 INCLUDEPATH += E:\OpenCV\install\include \
 E:\ffmpeg322\include \
 E:\RTP\jrtpnothread\include \
@@ -57,6 +61,9 @@ LIBS += -LE:\OpenCV\install\bin -llibopencv_core231 -llibopencv_highgui231 \
 -LE:\RTP\jrtpnothread\lib -llibjrtplib_d \
 -LE:\PA\PAnoASIO\lib -llibportaudio \
 -lws2_32
+
+
+
 
 
 

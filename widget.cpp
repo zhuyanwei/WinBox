@@ -26,7 +26,7 @@ Widget::Widget(QWidget *parent) :
     connect(ui->B_Connect,SIGNAL(clicked()),this,SLOT(on_B_Connect()));
     connect(ui->B_Invite,SIGNAL(clicked()),this,SLOT(on_B_Invite()));
     connect(ui->B_Add,SIGNAL(clicked()),this,SLOT(on_B_Add()));
-    connect(ui->B_Pause,SIGNAL(clicked()),this,SLOT(on_B_Pause()));
+    connect(ui->B_Finish,SIGNAL(clicked()),this,SLOT(on_B_Finish()));
     connect(ui->B_Test,SIGNAL(clicked()),this,SLOT(on_B_Test()));
 
     connect(timer, SIGNAL(timeout()), this, SLOT(proAudio()));
@@ -87,7 +87,7 @@ void Widget::on_B_CloseCam()
     end();
 }
 
-void Widget::on_B_Pause()
+void Widget::on_B_Finish()
 {
     //finish local tasks
     end();
@@ -104,8 +104,6 @@ void Widget::on_B_Pause()
 
 void Widget::on_B_Initial()
 {
-    qDebug()<<"B_Initial clicked";
-
     //***************************************************reading ini file way
 //    QSettings *configIniRead = new QSettings("Settings", QSettings::IniFormat);
 //    uint16_t localport = configIniRead->value("Local/port").toInt();
@@ -184,10 +182,22 @@ void Widget::on_B_Initial()
 //    RTPIPv4Address m_addr(ntohl(m_ip), m_port);
 //    status = session.JoinMulticastGroup(m_addr);
     connect(udpSocket,SIGNAL(readyRead()),this,SLOT(proRequest()));
+    //UI part moving
+    //before(0,0,600,500)
+    ui->F_Welcome->setGeometry(600,0,600,500);
+    //before(0,550,600,50)
+    ui->Wig_Initial->setGeometry(600,550,600,50);
+    //before(600,450,600,150)
+    ui->Wig_Working->setGeometry(0,450,600,150);
 }
 
 void Widget::on_B_Test()
 {
+//    ui->w1->geometry().x()=0;
+//    ui->w1->geometry().y()=0;
+//    ui->w1->setGeometry(100,100,100,100);
+    qDebug()<<"current applicationDirPath: "<<QCoreApplication::applicationDirPath();
+//    qDebug()<<"current currentPath: "<<QDir::currentPath();
 }
 
 int Widget::slotTest()
