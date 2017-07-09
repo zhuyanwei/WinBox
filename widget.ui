@@ -69,7 +69,7 @@
        <item>
         <widget class="QLineEdit" name="I_RemoteIP">
          <property name="text">
-          <string>127.0.0.1</string>
+          <string>192.168.1.1</string>
          </property>
         </widget>
        </item>
@@ -210,7 +210,7 @@
      <item>
       <widget class="QLineEdit" name="I_SSRC">
        <property name="text">
-        <string>22</string>
+        <string>100</string>
        </property>
       </widget>
      </item>
