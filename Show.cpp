@@ -6,6 +6,8 @@ Show::Show(QWidget *parent ,RTPSession *session,DecodeAU **audecode ) :
     ui(new Ui::Show)
 {
     ui->setupUi(this);
+    //set UI part
+    setWindowTitle("Remote video");
 
     rtpSess = session;
     timer   = new QTimer(this);
@@ -90,9 +92,10 @@ void Show::readingFrame()
                 else if (rtpPack->GetPayloadType() == H264)
                 {
                     uint32_t packssrc = rtpPack->GetSSRC();
+                    remoteSSRC = QString("SSRC:%1").arg(packssrc);
                     int number= 1;
-                    if (packssrc == ssrc[0]) number = 1;
-                    else if(packssrc == ssrc[1]) number = 2;
+//                    if (packssrc == ssrc[0]) number = 1;
+//                    else if(packssrc == ssrc[1]) number = 2;
                     switch (number)
                     {
                         case 1:
@@ -139,6 +142,8 @@ void Show::readingFrame()
 
 void Show::showAllWindow()
 {
+    //set UI label
+    ui->L_SSRC->setText(remoteSSRC);
     if (updateR)
     {
         imageR = QImage((const uchar*)disBufR,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();

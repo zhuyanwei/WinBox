@@ -44,6 +44,7 @@ private:
     RTPPacket *rtpPack;
     int status, timeout;
     QImage imageR,imageT;
+    QString remoteSSRC;
 
 signals:
     getFrame();
