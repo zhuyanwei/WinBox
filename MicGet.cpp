@@ -7,7 +7,7 @@ MicGet::MicGet(QObject *parent) : QObject(parent)
 
 MicGet::~MicGet()
 {
-
+    printf("MicGet destruct\n");
 }
 
 int MicGet::initAudio(AVAudioFifo **auinFifo, AVAudioFifo **auoutFifo)
@@ -69,7 +69,7 @@ done:
 int MicGet::recordAudio()
 {
     err = Pa_StartStream( stream );
-    if( err != paNoError ) goto done;
+//    if( err != paNoError ) goto done;
     qDebug("\n=== Now recording!! Please speak into the microphone. ===\n");
     fflush(stdout);
     while( ( err = Pa_IsStreamActive( stream ) ) == 1 && isStop == false)
@@ -78,39 +78,44 @@ int MicGet::recordAudio()
         printf("index = \n");
         fflush(stdout);
     }
-    if( err < 0 ) goto done;
-    err = Pa_CloseStream( stream );
-    if( err != paNoError ) goto done;
-    return 0 ;
-done:
-    Pa_Terminate();
-    if( data.recordedSamples )       /* Sure it is NULL or valid. */
-        free( data.recordedSamples );
-    if( data.receivedSamples )       /* Sure it is NULL or valid. */
-        free( data.receivedSamples );
-    if( err != paNoError )
-    {
-        qDebug("An error occured while using the portaudio stream\n");
-        qDebug("Error number: %d\n", err);
-        qDebug("Error message: %s\n", Pa_GetErrorText( err ));
-        err = 1;
-    }
-    return err;
+    err = Pa_OpenStream(&stream,&inputPara, &outputPara,SAMPLE_RATE,FRAMES_PER_BUFFER,paClipOff, audioCallback,&data );
+    qDebug("Error message: %s\n", Pa_GetErrorText( err ));
+    qDebug("record mic out\n");
+    return 1;
+//    if( err < 0 ) goto done;
+//    err = Pa_CloseStream( stream );
+//    if( err != paNoError ) goto done;
+//    return 0 ;
+//done:
+//    Pa_Terminate();
+//    if( data.recordedSamples )       /* Sure it is NULL or valid. */
+//        free( data.recordedSamples );
+//    if( data.receivedSamples )       /* Sure it is NULL or valid. */
+//        free( data.receivedSamples );
+//    if( err != paNoError )
+//    {
+//        qDebug("An error occured while using the portaudio stream\n");
+//        qDebug("Error number: %d\n", err);
+//        qDebug("Error message: %s\n", Pa_GetErrorText( err ));
+//        err = 1;
+//    }
+//    return err;
 }
 
 int MicGet::closeAudio()
 {
     Pa_Terminate();
-    if( data.recordedSamples )       /* Sure it is NULL or valid. */
-        free( data.recordedSamples );
-    if( data.receivedSamples )       /* Sure it is NULL or valid. */
-        free( data.receivedSamples );
-    if( err != paNoError )
-    {
-        qDebug("An error occured while using the portaudio stream\n" );
-        qDebug("Error number: %d\n", err );
-        qDebug("Error message: %s\n", Pa_GetErrorText( err ));
-        err = 1;
-    }
-    return err;
+    return 1;
+//    if( data.recordedSamples )       /* Sure it is NULL or valid. */
+//        free( data.recordedSamples );
+//    if( data.receivedSamples )       /* Sure it is NULL or valid. */
+//        free( data.receivedSamples );
+//    if( err != paNoError )
+//    {
+//        qDebug("An error occured while using the portaudio stream\n" );
+//        qDebug("Error number: %d\n", err );
+//        qDebug("Error message: %s\n", Pa_GetErrorText( err ));
+//        err = 1;
+//    }
+//    return err;
 }

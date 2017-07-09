@@ -47,6 +47,8 @@ HEADERS  += widget.h \
 FORMS    += widget.ui \
     Show.ui
 
+RESOURCES += \
+    qtre.qrc
 INCLUDEPATH += /usr/include \
 /usr/local/JRtp/include
 

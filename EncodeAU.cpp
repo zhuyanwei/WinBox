@@ -8,7 +8,7 @@ EncodeAU::EncodeAU()
 }
 EncodeAU::~EncodeAU()
 {
-
+    printf("EncodeAU destruct\n");
 }
 
 int EncodeAU::encodeAUOpen()
@@ -64,7 +64,7 @@ void EncodeAU::encodeAUClose()
 
 int EncodeAU::encodeAUDo(void **poBuf,int *poLen)
 {
-    out = fopen("test.aac","a");
+ //   out = fopen("test.aac","a");
     *poLen = 0;
     av_free_packet(&pkt);
     av_init_packet(&pkt);
@@ -78,11 +78,11 @@ int EncodeAU::encodeAUDo(void **poBuf,int *poLen)
     }
     if (gotFrame==1)
     {
-        fwrite(pkt.data,pkt.size,1,out);
+   //     fwrite(pkt.data,pkt.size,1,out);
         *poBuf = pkt.data;
         *poLen = pkt.size;
     }
-    fclose(out);
+ //   fclose(out);
     return 0;
 }
 

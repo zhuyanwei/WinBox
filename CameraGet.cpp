@@ -7,7 +7,8 @@ CameraGet::CameraGet()
 
 CameraGet::~CameraGet()
 {
-
+//    free(this);
+    qDebug("CameraGet destruct");
 }
 
 int CameraGet::openCamera(int width,int height)

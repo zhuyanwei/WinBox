@@ -2,15 +2,16 @@
 #define WIDGET_H
 
 #include <QWidget>
-#include <unistd.h>
 #include <QImage>
 #include <QTime>
 #include <QString>
+#include <QSettings>
 #include <QDebug>
 #include <QMessageBox>
 #include <QHostInfo>
 #include <QUdpSocket>
 #include <QNetworkInterface>
+#include <unistd.h>
 #include "ThreadCamera.h"
 #include "ThreadMic.h"
 #include "EncodeAU.h"
@@ -21,7 +22,7 @@ namespace Ui {
 class Widget;
 }
 
-enum MessageType{Request,Callback,Callback2,Invite,CutIn,CutInCB};
+enum MessageType{Request,Callback,Callback2,Invite,CutIn,CutInCB,End,CallbackEnd};
 
 class Widget : public QWidget
 {
@@ -34,7 +35,7 @@ public:
 private slots:
     void on_B_OpenCam();
     void on_B_CloseCam();
-    void on_B_Pause();
+    void on_B_Finish();
     void on_B_Initial();
     void on_B_Connect();
     void on_B_Invite();
@@ -49,6 +50,8 @@ private:
     bool checkError(int rtpErr);
     void addDest(uint32_t dest_ip,uint16_t dest_port);
     void sendMessage(MessageType type,char* destip);
+    void end();
+    void begin();
 
     Ui::Widget *ui;
     ThreadCamera *TC;

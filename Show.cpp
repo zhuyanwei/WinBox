@@ -6,6 +6,8 @@ Show::Show(QWidget *parent ,RTPSession *session,DecodeAU **audecode ) :
     ui(new Ui::Show)
 {
     ui->setupUi(this);
+    //set UI part
+    setWindowTitle("Remote video");
 
     rtpSess = session;
     timer   = new QTimer(this);
@@ -40,9 +42,19 @@ Show::~Show()
     rtpReR->netClose();
     deT->decodeClose();
     rtpReT->netClose();
+    delete deR;
+    delete rtpReR;
+    delete deT;
+    delete rtpReT;
+    deR = NULL;
+    rtpReR = NULL;
+    deT = NULL;
+    rtpReT = NULL;
     free(recvBufR);
     free(recvBufT);
+    free(recvBufa);
     delete ui;
+    printf("Show destruct\n");
 }
 
 void Show::checkError( int errorCode )
@@ -80,9 +92,10 @@ void Show::readingFrame()
                 else if (rtpPack->GetPayloadType() == H264)
                 {
                     uint32_t packssrc = rtpPack->GetSSRC();
+                    remoteSSRC = QString("SSRC:%1").arg(packssrc);
                     int number= 1;
-                    if (packssrc == ssrc[0]) number = 1;
-                    else if(packssrc == ssrc[1]) number = 2;
+//                    if (packssrc == ssrc[0]) number = 1;
+//                    else if(packssrc == ssrc[1]) number = 2;
                     switch (number)
                     {
                         case 1:
@@ -129,17 +142,19 @@ void Show::readingFrame()
 
 void Show::showAllWindow()
 {
+    //set UI label
+    ui->L_SSRC->setText(remoteSSRC);
     if (updateR)
     {
         imageR = QImage((const uchar*)disBufR,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
-        imageR = imageR.mirrored(true,false);
+//        imageR = imageR.mirrored(true,false);
         ui->L_RemoteWindow->setPixmap(QPixmap::fromImage(imageR));
         updateR = false;
     }
     if (updateT)
     {
         imageT = QImage((const uchar*)disBufT,WIDTH,HEIGHT, QImage::Format_RGB888).rgbSwapped();
-        imageT = imageT.mirrored(true,false);
+//        imageT = imageT.mirrored(true,false);
         ui->L_ThirdWindow->setPixmap(QPixmap::fromImage(imageT));
         updateT = false;
     }

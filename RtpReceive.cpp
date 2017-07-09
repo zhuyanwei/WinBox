@@ -7,7 +7,8 @@ RtpReceive::RtpReceive()
 
 RtpReceive::~RtpReceive()
 {
-
+//    free(this);
+    printf("RtpReceive destruct");
 }
 
 void RtpReceive::freeNALU(NALU_t *n)
@@ -165,7 +166,7 @@ int RtpReceive::rtpUnpackage(char *bufIn, int len, bool marker, void **bufOut, i
 
 void RtpReceive::netClose()
 {
-    free(this);
+//    free(this);
     qDebug()<<"Network Closed";
 }
 

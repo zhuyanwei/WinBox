@@ -46,6 +46,16 @@ ThreadCamera::~ThreadCamera()
     ec->encodeClose();
     cv->convertClose();
     cg->closeCamera();
+    delete rs;
+    delete ec;
+    delete cv;
+    delete cg;
+    rs = NULL;
+    ec = NULL;
+    cv = NULL;
+    cg = NULL;
+//    free(this);
+    qDebug("ThreadCamera destruct");
 }
 void ThreadCamera::run()
 {

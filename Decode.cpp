@@ -7,7 +7,8 @@ Decode::Decode()
 
 Decode::~Decode()
 {
-
+//    free(this);
+    printf("Decode destruct\n");
 }
 
 int Decode::decodeOpen()
@@ -121,7 +122,7 @@ void Decode::decodeClose()
     av_frame_free(&this->picture);
     avcodec_close(this->ctx);
     av_free(this->ctx);
-    free(this);
+//    free(this);
     qDebug()<<"Decode Closed";
 }
 
