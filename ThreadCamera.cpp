@@ -92,7 +92,7 @@ void ThreadCamera::run()
 
         }
         frameCount++;
-        qDebug()<<frameCount;
+//        qDebug()<<frameCount;
     }
     isStop = true;
     qDebug()<<"ThreadCamera out";

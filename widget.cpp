@@ -99,7 +99,7 @@ void Widget::on_B_Finish()
     struct in_addr a1;
 //    uint32_t b1 = ipList[1];
 //    memcpy(&a1,&b1,4);
-    a1.S_un.S_addr = ipList[1];
+    a1.s_addr = ipList[1];
     char* destip = inet_ntoa(a1);
     qDebug()<<"Remote ip--"<<destip;
     sendMessage(End,destip);

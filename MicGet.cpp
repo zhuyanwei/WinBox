@@ -75,7 +75,7 @@ int MicGet::recordAudio()
     while( ( err = Pa_IsStreamActive( stream ) ) == 1 && isStop == false)
     {
         Pa_Sleep(1000);
-        printf("index = \n");
+//        printf("index = \n");
         fflush(stdout);
     }
     err = Pa_OpenStream(&stream,&inputPara, &outputPara,SAMPLE_RATE,FRAMES_PER_BUFFER,paClipOff, audioCallback,&data );
