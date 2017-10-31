@@ -38,6 +38,7 @@ Widget::Widget(QWidget *parent) :
     isStart = 0;
     isStart2 = 0;
     isServer = 1;
+    answer2Req = false;
 }
 
 Widget::~Widget()
@@ -178,6 +179,11 @@ void Widget::on_B_Initial()
             qDebug()<<"Local ip--"<<ba;
         }
     }
+//    QByteArray bb = "192.168.1.122";
+//    uint32_t cc = inet_addr(bb.data());
+//    qDebug()<<"l2--"<<bb;
+//    if(cc == ipList[0])
+//        qDebug()<<"yesyes";
 //    //multi play part
 //    status = session.SupportsMulticasting();
 //    m_ip = inet_addr("111.1.1.1");
@@ -258,7 +264,7 @@ void Widget::sendMessage(MessageType type,char* destip)
         {
             //local ip
             //the answer of yes or no
-            out<<isStart2<<ipList[0]<<portList[0]<<ssrcList[0];
+            out<<answer2Req<<ipList[0]<<portList[0]<<ssrcList[0];
             port = 8010;
             break;
         }
@@ -267,29 +273,6 @@ void Widget::sendMessage(MessageType type,char* destip)
             port = 8010;
             break;
         }
-//        case Callback2:
-//        {
-//            port = 8010;
-//            break;
-//        }
-//        case Invite:
-//        {
-//            out<<ipList[0]<<portList[0]<<ssrcList[0]<<ipList[1]<<portList[1]<<ssrcList[1];
-//            port = 8010;
-//            break;
-//        }
-//        case CutIn:
-//        {
-//            out<<QCIp<<QCPort;
-//            port = 8010;
-//            break;
-//        }
-//        case CutInCB:
-//        {
-//            out<<ssrcList[0]<<ssrcList[1]<<ssrcList[2];
-//            port = 8010;
-//            break;
-//        }
     }
     udpSocket->writeDatagram(data,data.length(),QHostAddress(destip),port);
 }
@@ -327,10 +310,13 @@ void Widget::proRequest()
                 uint32_t srcip;
                 uint32_t ssrc;
                 in>>name>>srcip>>srcport>>ssrc;
+                struct in_addr t1;
+                t1.s_addr = srcip;
+                QByteArray t2= inet_ntoa(t1);
+                qDebug()<<"type is Request,from--"<<t2;
                 int btn = QMessageBox::information(this,"New request",tr("Request from %1").arg(name),QMessageBox::Yes,QMessageBox::No);
                 if (btn == QMessageBox::Yes)
                 {
-    //                    addDest(m_ip,m_port);
                     addDest(srcip,srcport);
                     qDebug()<<"request goto adddest";
                     //the server self starts
@@ -340,10 +326,13 @@ void Widget::proRequest()
                     ipList[1] = srcip;
                     portList[1] = srcport;
                     ssrcList[1] = ssrc;
+
+                    answer2Req = true;
                 }
                 else if (btn == QMessageBox::No)
                 {
                     isStart2 = false;
+                    answer2Req = false;
                 }
                 struct in_addr tempip;
                 tempip.s_addr = srcip;
@@ -359,11 +348,14 @@ void Widget::proRequest()
                 uint32_t srcip;
                 uint32_t ssrc;
                 in>>YesorNo>>srcip>>srcport>>ssrc;
+                struct in_addr t1;
+                t1.s_addr = srcip;
+                QByteArray t2= inet_ntoa(t1);
+                qDebug()<<"type is Callback,from--"<<t2;
                 if (YesorNo == true)
                 {
                     if (isStart == false)
                     {
-//                        addDest(m_ip,m_port);
                         addDest(srcip,srcport);
                         //the client self starts
                         begin();
@@ -383,67 +375,10 @@ void Widget::proRequest()
 
             case End:
             {
+                qDebug()<<"type is End";
                 end();
                 break;
             }
-
-//            case Callback2:
-//            {
-//                if (isStart == 0)
-//                {
-//                    TC = new ThreadCamera(&session);
-//                    connect(TC,SIGNAL(captured()),this,SLOT(showLocalPic()),Qt::BlockingQueuedConnection);
-//                    isStart = 1;
-//                    TC->start();
-//                    TM = new ThreadMic(mg);
-//                    TM->start();
-//                }
-//                break;
-//            }
-//            case Invite:
-//            {
-//                in>>ipList[1]>>portList[1]>>ssrcList[1]>>ipList[2]>>portList[2]>>ssrcList[2];
-//                int btn = QMessageBox::information(this,"Invitation","invitation",QMessageBox::Yes,QMessageBox::No);
-//                if (btn == QMessageBox::Yes)
-//                {
-//                    addDest(m_ip,m_port);
-//                    sh = new Show(this,&session,&da);
-//                    sh->ssrc[0] = ssrcList[1];
-//                    sh->ssrc[1] = ssrcList[2];
-//                    sh->show();
-//                    isStart2 =1;
-//                }
-//                else if (btn == QMessageBox::No)
-//                {
-//                    isStart2 = 0;
-//                }
-//                struct in_addr tempip;
-//                tempip.s_addr = ipList[1];
-//                char *temp_ip= inet_ntoa(tempip);
-//                sendMessage(Callback,temp_ip);
-//                tempip.s_addr = ipList[2];
-//                temp_ip= inet_ntoa(tempip);
-//                sendMessage(Callback,temp_ip);
-//                break;
-//            }
-//            case CutIn:
-//            {
-//                in>>QCIp>>QCPort;
-//                if (isServer == 1)
-//                {
-//                    struct in_addr tempip;
-//                    tempip.s_addr = ipList[1];
-//                    char *temp_ip= inet_ntoa(tempip);
-//                    sendMessage(CutIn,temp_ip);
-//                    tempip.s_addr = ipList[2];
-//                    temp_ip= inet_ntoa(tempip);
-//                    sendMessage(CutIn,temp_ip);
-//                    tempip.s_addr = QCIp;
-//                    temp_ip= inet_ntoa(tempip);
-//                    sendMessage(CutInCB,temp_ip);
-//                }
-//                break;
-//            }
         }
     }
 }

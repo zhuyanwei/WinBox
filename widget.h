@@ -65,7 +65,7 @@ private:
     int aeSize;
     QTimer *timer;
 
-    bool isStart,isStart2,isServer;
+    bool isStart,isStart2,isServer,answer2Req;
     QTimer *timerCam;
     QImage *img;
     QImage imgLocal;
